@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Db } from 'mongodb';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto, User, UserData } from './models/user.model';
@@ -30,7 +30,10 @@ export class UsersService {
                 username: data.username
             }
         } catch (error) {
-
+            if(error.code === 11000) {
+                throw new BadRequestException('Email already registered');
+            }
+            throw new BadRequestException('Failed to register user')
         }
     }
 
