@@ -29,12 +29,14 @@ export class UsersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('/test')
-    getSomething(
+    @Get()
+    async find(
         @Request() req
     ) {
-        console.log('Beleza!')
-        return req.user
+        const user = await this.userService.findById(req.user.userId);
+        user.token = req.user.token;
+
+        return user;
     }
 
 }

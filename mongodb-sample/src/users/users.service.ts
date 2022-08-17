@@ -1,5 +1,5 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Collection, Db } from 'mongodb';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserDto, User, UserData } from './models/user.model';
 import * as argon2 from 'argon2'
 
@@ -37,6 +37,21 @@ export class UsersService {
                 throw new BadRequestException('Email already registered');
             }
             throw new BadRequestException('Failed to register user')
+        }
+    }
+
+    async findById(userId: string): Promise<Partial<User>> {
+        const user = await this.userCollection.findOne({ _id: new ObjectId(userId) as any })
+
+        if (!user) {
+            throw new NotFoundException('user not found');
+        }
+
+        return {
+            email: user.email,
+            bio: user.bio ?? '',
+            image: user.image ?? '',
+            username: user.username
         }
     }
 
