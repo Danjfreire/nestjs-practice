@@ -1,20 +1,23 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Db } from 'mongodb';
-import { AuthService } from 'src/auth/auth.service';
+import { Collection, Db } from 'mongodb';
 import { CreateUserDto, User, UserData } from './models/user.model';
+import * as argon2 from 'argon2'
 
 @Injectable()
 export class UsersService {
 
+    private userCollection: Collection<UserData>;
+
     constructor(
         @Inject('DATABASE_CONNECTION')
         private db: Db,
-        private authService : AuthService
-    ) { }
+    ) {
+        this.userCollection = this.db.collection('users');
+    }
 
     async register(data: CreateUserDto): Promise<User> {
         try {
-            const hashedPassword = await this.authService.hashPassword(data.password);
+            const hashedPassword = await argon2.hash(data.password);
             await this.db.collection('users')
                 .insertOne({
                     username: data.username,
@@ -30,11 +33,15 @@ export class UsersService {
                 username: data.username
             }
         } catch (error) {
-            if(error.code === 11000) {
+            if (error.code === 11000) {
                 throw new BadRequestException('Email already registered');
             }
             throw new BadRequestException('Failed to register user')
         }
+    }
+
+    async findByEmail(email: string): Promise<UserData | null> {
+        return await this.userCollection.findOne({ email });
     }
 
 }
