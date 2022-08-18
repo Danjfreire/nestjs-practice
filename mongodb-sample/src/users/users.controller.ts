@@ -10,7 +10,7 @@ export class UsersController {
 
     constructor(
         private userService: UsersService,
-        private authService : AuthService
+        private authService: AuthService
     ) { }
 
     @Post('/login')
@@ -18,7 +18,7 @@ export class UsersController {
     async login(
         @Request() req
     ) {
-        return await this.authService.login(req.user)
+        return await this.authService.login(req.user);
     }
 
     @Post()
@@ -32,9 +32,16 @@ export class UsersController {
     @Get()
     async find(
         @Request() req
-    ) {
-        const user = await this.userService.findById(req.user.userId);
-        user.token = req.user.token;
+    ) : Promise<User> {
+        const userData = await this.userService.findByEmail(req.user.email);
+
+        const user : User = {
+            bio : userData?.bio ?? '',
+            email : userData.email,
+            image : userData?.image ?? '',
+            username : userData.username,
+            token : req.headers.authorization.split(' ')[1],
+        }
 
         return user;
     }

@@ -1,7 +1,6 @@
 import { IsEmail, IsString } from "class-validator";
 
 export interface UserData {
-    _id : string;
     email : string;
     username : string;
     password : string;

@@ -1,7 +1,8 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserDto, User, UserData } from './models/user.model';
 import * as argon2 from 'argon2'
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,8 @@ export class UsersService {
     constructor(
         @Inject('DATABASE_CONNECTION')
         private db: Db,
+        @Inject(forwardRef(() => AuthService))
+        private authService: AuthService
     ) {
         this.userCollection = this.db.collection('users');
     }
@@ -18,45 +21,33 @@ export class UsersService {
     async register(data: CreateUserDto): Promise<User> {
         try {
             const hashedPassword = await argon2.hash(data.password);
-            await this.db.collection('users')
+            await this.userCollection
                 .insertOne({
                     username: data.username,
                     email: data.email,
                     password: hashedPassword
                 })
 
-            return {
-                email: data.email,
-                bio: '',
-                image: '',
-                token: 'token',
-                username: data.username
-            }
+            const user = await this.authService.validateUser(data.email, data.password)
+
+            return await this.authService.login(user)
         } catch (error) {
             if (error.code === 11000) {
                 throw new BadRequestException('Email already registered');
+            } else {
+                throw new BadRequestException('Failed to register user')
             }
-            throw new BadRequestException('Failed to register user')
         }
     }
 
-    async findById(userId: string): Promise<Partial<User>> {
-        const user = await this.userCollection.findOne({ _id: new ObjectId(userId) as any })
+    async findByEmail(email: string): Promise<UserData> {
+        const user = await this.userCollection.findOne({ email });
 
-        if (!user) {
-            throw new NotFoundException('user not found');
+        if(!user) {
+            throw new NotFoundException('User not found')
         }
 
-        return {
-            email: user.email,
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            username: user.username
-        }
-    }
-
-    async findByEmail(email: string): Promise<UserData | null> {
-        return await this.userCollection.findOne({ email });
+        return user;
     }
 
 }

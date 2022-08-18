@@ -1,6 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from 'src/auth/models/login.model';
 import { User, UserData } from 'src/users/models/user.model';
 import * as argon2 from "argon2";
 import { UsersService } from 'src/users/users.service';
@@ -18,10 +17,6 @@ export class AuthService {
         const user = await this.userService.findByEmail(email);
 
         //check if password matches
-        if (!user) {
-            return null
-        }
-
         if (!await argon2.verify(user.password, password)) {
             return null;
         }
@@ -29,8 +24,8 @@ export class AuthService {
         return user;
     }
 
-    async login(user: UserData) {
-        const payload = { username: user.username, email: user.email, sub: user._id }
+    async login(user: UserData) : Promise<User> {
+        const payload = { username: user.username, sub: user.email }
         const token = this.jwtService.sign(payload);
 
         return {
