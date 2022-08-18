@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from "class-validator";
+import { IsEmail, IsOptional, IsString } from "class-validator";
 
 export interface UserData {
     email : string;
@@ -26,4 +26,28 @@ export class CreateUserDto {
 
     @IsString()
     password : string;
+}
+
+export class UpdateUserDto {
+
+    @IsOptional()
+    @IsEmail()
+    email ?: string;
+
+    @IsOptional()
+    @IsString()
+    username ?: string;
+
+    @IsOptional()
+    @IsString()
+    password ?: string;
+
+    @IsOptional()
+    @IsString()
+    bio ?: string;
+
+    @IsOptional()
+    @IsString()
+    image ?: string;
+
 }

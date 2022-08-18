@@ -1,6 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
-import { CreateUserDto, User, UserData } from './models/user.model';
+import { CreateUserDto, UpdateUserDto, User, UserData } from './models/user.model';
 import * as argon2 from 'argon2'
 import { AuthService } from 'src/auth/auth.service';
 
@@ -48,6 +48,16 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    async update(email : string, data : UpdateUserDto) : Promise<UserData> {
+        if(data.password) {
+            data.password = await argon2.hash(data.password)
+        }
+
+        await this.userCollection.updateOne({email : email}, {$set : data});
+
+        return await this.findByEmail(data.email ?? email);
     }
 
 }
