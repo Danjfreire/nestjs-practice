@@ -40,22 +40,32 @@ export class UsersService {
         }
     }
 
+    async findByUsername(username: string): Promise<UserData> {
+        const user = await this.userCollection.findOne({ username })
+
+        if(!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
+    }
+
     async findByEmail(email: string): Promise<UserData> {
         const user = await this.userCollection.findOne({ email });
 
-        if(!user) {
+        if (!user) {
             throw new NotFoundException('User not found')
         }
 
         return user;
     }
 
-    async update(email : string, data : UpdateUserDto) : Promise<UserData> {
-        if(data.password) {
+    async update(email: string, data: UpdateUserDto): Promise<UserData> {
+        if (data.password) {
             data.password = await argon2.hash(data.password)
         }
 
-        await this.userCollection.updateOne({email : email}, {$set : data});
+        await this.userCollection.updateOne({ email: email }, { $set: data });
 
         return await this.findByEmail(data.email ?? email);
     }
