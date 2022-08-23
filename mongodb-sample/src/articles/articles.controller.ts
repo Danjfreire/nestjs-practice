@@ -1,7 +1,7 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
-import { CreateArticleDto } from './models/article.model';
+import { Article, CreateArticleDto } from './models/article.model';
 
 @Controller('articles')
 export class ArticlesController {
@@ -20,5 +20,13 @@ export class ArticlesController {
        
        return await this.articleService.createArticle(username, data);
     }
+
+    @Get(':slug')
+    async getArticle(
+        @Param('slug') slug : string,
+    ) : Promise<Article> {
+       return await this.articleService.getArticle(slug);
+    }
+
 
 }

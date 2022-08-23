@@ -52,6 +52,27 @@ export class ArticlesService {
         return article;
     }
 
+    async getArticle(slug: string) : Promise<Article> {
+        const article = await this.articleCollection.aggregate()
+            .match({ slug })
+            .lookup({
+                from: 'users',
+                localField: 'author',
+                foreignField: 'username',
+                as: 'author',
+                pipeline: [
+                    {
+                        $project: {_id: 0, password : 0 }
+                    }
+                ]
+            })
+            .unwind("$author")
+            .project({ _id: 0 })
+            .next();
+
+        return article as Article;
+    }
+
     private getTitleSlug(title: string) {
         return title.toLocaleLowerCase().replace(/ /g, '-');
     }
