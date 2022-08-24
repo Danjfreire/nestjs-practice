@@ -1,57 +1,52 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Collection, Db, ObjectId } from 'mongodb';
-import { CreateUserDto, UpdateUserDto, User, UserData } from './models/user.model';
-import * as argon2 from 'argon2'
+import { CreateUserDto, UpdateUserDto, User, UserAuth, UserDocument } from './models/user.model';
 import { AuthService } from 'src/auth/auth.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
 
-    private userCollection: Collection<UserData>;
-
     constructor(
-        @Inject('DATABASE_CONNECTION')
-        private db: Db,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
         @Inject(forwardRef(() => AuthService))
         private authService: AuthService
     ) {
-        this.userCollection = this.db.collection('users');
     }
 
-    async register(data: CreateUserDto): Promise<User> {
+    async register(data: CreateUserDto): Promise<UserAuth> {
+
         try {
-            const hashedPassword = await argon2.hash(data.password);
-            await this.userCollection
-                .insertOne({
-                    username: data.username,
-                    email: data.email,
-                    password: hashedPassword
-                })
-
-            const user = await this.authService.validateUser(data.email, data.password)
-
-            return await this.authService.login(user)
+            const hashedPassword = await this.authService.hashPassword(data.password);
+            await new this.userModel({
+                email: data.email,
+                username: data.username,
+                password: hashedPassword
+            }).save();
         } catch (error) {
+            console.error(error);
             if (error.code === 11000) {
-                throw new BadRequestException('Email already registered');
-            } else {
-                throw new BadRequestException('Failed to register user')
+                throw new BadRequestException('Email or username registered');
             }
         }
+
+        return await this.authService.login({ email: data.email, password: data.password });
     }
 
-    async findByUsername(username: string): Promise<UserData> {
-        const user = await this.userCollection.findOne({ username })
+    async findByUsername(username: string): Promise<User> {
 
-        if(!user) {
+        const user = await this.userModel.findOne({ username });
+
+        if (!user) {
             throw new NotFoundException('User not found');
         }
 
         return user;
     }
 
-    async findByEmail(email: string): Promise<UserData> {
-        const user = await this.userCollection.findOne({ email });
+    async findByEmail(email: string): Promise<User> {
+
+        const user = await this.userModel.findOne({ email });
 
         if (!user) {
             throw new NotFoundException('User not found')
@@ -60,14 +55,15 @@ export class UsersService {
         return user;
     }
 
-    async update(email: string, data: UpdateUserDto): Promise<UserData> {
+    async update(email: string, data: UpdateUserDto): Promise<User> {
+
         if (data.password) {
-            data.password = await argon2.hash(data.password)
+            data.password = await this.authService.hashPassword(data.password);
         }
 
-        await this.userCollection.updateOne({ email: email }, { $set: data });
+        const user = await this.userModel.findOneAndUpdate({ email }, data, {new : true})
 
-        return await this.findByEmail(data.email ?? email);
+        return user;
     }
 
 }

@@ -1,75 +1,73 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsOptional, IsString } from "class-validator";
+import { Document } from "mongoose";
 
+
+export type UserDocument = User & Document;
 
 @Schema()
 export class User {
 
-    @Prop()
-    email : string;
+    @Prop({ required: true, unique: true })
+    email: string;
+
+    @Prop({ required: true, unique: true })
+    username: string;
 
     @Prop()
-    username : string;
+    bio: string;
 
     @Prop()
-    bio : string;
+    image : string;
 
-    @Prop()
-    password : string;
-
+    @Prop({ required: true })
+    password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-
-export interface UserData {
-    email : string;
-    username : string;
-    password : string;
-    bio ?: string;
-    image ?: string;
+export interface UserAuth {
+    email: string;
+    token: string;
+    username: string;
+    bio?: string;
+    image?: string;
 }
 
-export interface User {
-    email : string;
-    token : string;
-    username : string;
-    bio : string;
-    image : string;
-}
+
 
 export class CreateUserDto {
 
     @IsString()
-    username : string;
+    username: string;
 
     @IsEmail()
-    email : string;
+    email: string;
 
     @IsString()
-    password : string;
+    password: string;
 }
 
 export class UpdateUserDto {
 
     @IsOptional()
     @IsEmail()
-    email ?: string;
+    email?: string;
 
     @IsOptional()
     @IsString()
-    username ?: string;
+    username?: string;
 
     @IsOptional()
     @IsString()
-    password ?: string;
+    password?: string;
 
     @IsOptional()
     @IsString()
-    bio ?: string;
+    bio?: string;
 
     @IsOptional()
     @IsString()
-    image ?: string;
+    image?: string;
 
 }

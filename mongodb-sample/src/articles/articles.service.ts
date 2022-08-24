@@ -16,65 +16,65 @@ export class ArticlesService {
         this.articleCollection = this.db.collection('articles');
     }
 
-    async createArticle(authorUsername: string, data: CreateArticleDto) {
+    // async createArticle(authorUsername: string, data: CreateArticleDto) {
 
-        const user = await this.userService.findByUsername(authorUsername);
+    //     const user = await this.userService.findByUsername(authorUsername);
 
-        const now = new Date().toISOString();
-        const slug = this.getTitleSlug(data.title)
+    //     const now = new Date().toISOString();
+    //     const slug = this.getTitleSlug(data.title)
 
-        const articleData: ArticleData = {
-            ...data,
-            slug,
-            author: authorUsername,
-            createdAt: now,
-            updatedAt: now,
-            favoritesCount: 0,
-        }
+    //     const articleData: ArticleData = {
+    //         ...data,
+    //         slug,
+    //         author: authorUsername,
+    //         createdAt: now,
+    //         updatedAt: now,
+    //         favoritesCount: 0,
+    //     }
 
-        await this.articleCollection.insertOne(articleData);
+    //     await this.articleCollection.insertOne(articleData);
 
-        const article: Article = {
-            ...data,
-            slug,
-            createdAt: now,
-            updatedAt: now,
-            favoritesCount: 0,
-            favorited: false,
-            author: {
-                bio: user.bio ?? '',
-                following: false,
-                image: user.image ?? '',
-                username: user.username
-            }
-        }
+    //     const article: Article = {
+    //         ...data,
+    //         slug,
+    //         createdAt: now,
+    //         updatedAt: now,
+    //         favoritesCount: 0,
+    //         favorited: false,
+    //         author: {
+    //             bio: user.bio ?? '',
+    //             following: false,
+    //             image: user.image ?? '',
+    //             username: user.username
+    //         }
+    //     }
 
-        return article;
-    }
+    //     return article;
+    // }
 
-    async getArticle(slug: string) : Promise<Article> {
-        const article = await this.articleCollection.aggregate()
-            .match({ slug })
-            .lookup({
-                from: 'users',
-                localField: 'author',
-                foreignField: 'username',
-                as: 'author',
-                pipeline: [
-                    {
-                        $project: {_id: 0, password : 0 }
-                    }
-                ]
-            })
-            .unwind("$author")
-            .project({ _id: 0 })
-            .next();
+    // async getArticle(slug: string) : Promise<Article> {
+    //     const article = await this.articleCollection.aggregate()
+    //         .match({ slug })
+    //         .lookup({
+    //             from: 'users',
+    //             localField: 'author',
+    //             foreignField: 'username',
+    //             as: 'author',
+    //             pipeline: [
+    //                 {
+    //                     $project: {_id: 0, password : 0 }
+    //                 }
+    //             ]
+    //         })
+    //         .unwind("$author")
+    //         .project({ _id: 0 })
+    //         .next();
 
-        return article as Article;
-    }
+    //     return article as Article;
+    // }
 
-    private getTitleSlug(title: string) {
-        return title.toLocaleLowerCase().replace(/ /g, '-');
-    }
+    // private getTitleSlug(title: string) {
+    //     return title.toLocaleLowerCase().replace(/ /g, '-');
+    // }
 
 }

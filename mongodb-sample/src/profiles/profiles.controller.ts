@@ -10,31 +10,31 @@ export class ProfilesController {
         private profileService: ProfilesService
     ) { }
 
-    @UseGuards(JwtAuthGuard)
-    @Get(':username')
-    async findProfile(
-        @Param('username') username : string,
-        @Request() req
-    ) : Promise<Profile> {
-        return await this.profileService.findProfileByUsername(username, req.user.username);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Get(':username')
+    // async findProfile(
+    //     @Param('username') username : string,
+    //     @Request() req
+    // ) : Promise<Profile> {
+    //     return await this.profileService.findProfileByUsername(username, req.user.username);
+    // }
 
-    @UseGuards(JwtAuthGuard)
-    @Post(':username/follow')
-    async followProfile(
-        @Param('username') username : string,
-        @Request() req
-    ) : Promise<Profile> {
-        return await this.profileService.follow(username, req.user.username);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Post(':username/follow')
+    // async followProfile(
+    //     @Param('username') username : string,
+    //     @Request() req
+    // ) : Promise<Profile> {
+    //     return await this.profileService.follow(username, req.user.username);
+    // }
 
-    @UseGuards(JwtAuthGuard)
-    @Delete(':username/follow')
-    async unfollowProfile(
-        @Param('username') username : string,
-        @Request() req
-    ) : Promise<Profile> {
-        return await this.profileService.unfollow(username, req.user.username);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Delete(':username/follow')
+    // async unfollowProfile(
+    //     @Param('username') username : string,
+    //     @Request() req
+    // ) : Promise<Profile> {
+    //     return await this.profileService.unfollow(username, req.user.username);
+    // }
 
 }

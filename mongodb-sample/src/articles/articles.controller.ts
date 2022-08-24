@@ -10,23 +10,23 @@ export class ArticlesController {
         private articleService : ArticlesService
     ) { }
 
-    @UseGuards(JwtAuthGuard)
-    @Post()
-    async asynccreateArticle(
-        @Request() req,
-        @Body() data : CreateArticleDto
-    ) {
-       const username = req.user.username;
+    // @UseGuards(JwtAuthGuard)
+    // @Post()
+    // async asynccreateArticle(
+    //     @Request() req,
+    //     @Body() data : CreateArticleDto
+    // ) {
+    //    const username = req.user.username;
        
-       return await this.articleService.createArticle(username, data);
-    }
+    //    return await this.articleService.createArticle(username, data);
+    // }
 
-    @Get(':slug')
-    async getArticle(
-        @Param('slug') slug : string,
-    ) : Promise<Article> {
-       return await this.articleService.getArticle(slug);
-    }
+    // @Get(':slug')
+    // async getArticle(
+    //     @Param('slug') slug : string,
+    // ) : Promise<Article> {
+    //    return await this.articleService.getArticle(slug);
+    // }
 
 
 }

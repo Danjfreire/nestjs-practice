@@ -17,44 +17,44 @@ export class ProfilesService {
         this.followerCollection = db.collection('followers');
     }
 
-    async findProfileByUsername(username: string, requesterUsername: string): Promise<Profile> {
-        const user = await this.userService.findByUsername(username);
-        const isFollower = await this.followerCollection.findOne({ followUsername: username, followerUsername: requesterUsername });
+    // async findProfileByUsername(username: string, requesterUsername: string): Promise<Profile> {
+    //     const user = await this.userService.findByUsername(username);
+    //     const isFollower = await this.followerCollection.findOne({ followUsername: username, followerUsername: requesterUsername });
 
-        return {
-            username: user.username,
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            following: isFollower != null
-        }
-    }
+    //     return {
+    //         username: user.username,
+    //         bio: user.bio ?? '',
+    //         image: user.image ?? '',
+    //         following: isFollower != null
+    //     }
+    // }
 
-    async follow(username: string, followerUsername: string): Promise<Profile> {
-        // check if user exists
-        const user = await this.userService.findByUsername(username);
+    // async follow(username: string, followerUsername: string): Promise<Profile> {
+    //     // check if user exists
+    //     const user = await this.userService.findByUsername(username);
 
-        await this.followerCollection.insertOne({ followUsername: username, followerUsername });
+    //     await this.followerCollection.insertOne({ followUsername: username, followerUsername });
 
-        return {
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            username: user.username,
-            following: true
-        }
-    }
+    //     return {
+    //         bio: user.bio ?? '',
+    //         image: user.image ?? '',
+    //         username: user.username,
+    //         following: true
+    //     }
+    // }
 
-    async unfollow(username: string, followerUsername: string): Promise<Profile> {
-        const user = await this.userService.findByUsername(username);
+    // async unfollow(username: string, followerUsername: string): Promise<Profile> {
+    //     const user = await this.userService.findByUsername(username);
 
-        const followerData = await this.followerCollection.findOneAndDelete({ followUsername: username, followerUsername });
-        console.log(followerData);
+    //     const followerData = await this.followerCollection.findOneAndDelete({ followUsername: username, followerUsername });
+    //     console.log(followerData);
 
-        return {
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            username: user.username,
-            following: false
-        }
-    }
+    //     return {
+    //         bio: user.bio ?? '',
+    //         image: user.image ?? '',
+    //         username: user.username,
+    //         following: false
+    //     }
+    // }
 
 }

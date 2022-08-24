@@ -2,7 +2,8 @@ import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/co
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateUserDto, UpdateUserDto, User } from './models/user.model';
+import { LoginDto } from 'src/auth/models/login.model';
+import { CreateUserDto, UpdateUserDto, User, UserAuth } from './models/user.model';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -13,18 +14,17 @@ export class UsersController {
         private authService: AuthService
     ) { }
 
-    @UseGuards(AuthGuard('local'))
     @Post('/login')
     async login(
-        @Request() req
-    ) {
-        return await this.authService.login(req.user);
+        @Body() data: LoginDto
+    ): Promise<UserAuth> {
+        return await this.authService.login(data);
     }
 
     @Post()
     async register(
         @Body() data: CreateUserDto
-    ): Promise<User> {
+    ): Promise<UserAuth> {
         return await this.userService.register(data);
     }
 
@@ -32,18 +32,17 @@ export class UsersController {
     @Get()
     async find(
         @Request() req
-    ): Promise<User> {
-        const userData = await this.userService.findByEmail(req.user.email);
+    ): Promise<UserAuth> {
+        const user = await this.userService.findByEmail(req.user.email);
+        const token = req.headers.authorization.split(' ')[1];
 
-        const user: User = {
-            bio: userData?.bio ?? '',
-            email: userData.email,
-            image: userData?.image ?? '',
-            username: userData.username,
-            token: req.headers.authorization.split(' ')[1],
+        return {
+            email: user.email,
+            token,
+            username: user.username,
+            bio: user.bio ?? '',
+            image: user.image ?? ''
         }
-
-        return user;
     }
 
     @UseGuards(JwtAuthGuard)
@@ -51,10 +50,10 @@ export class UsersController {
     async update(
         @Body() data: UpdateUserDto,
         @Request() req
-    ): Promise<User> {
+    ): Promise<UserAuth> {
         const userData = await this.userService.update(req.user.email, data);
-        
-        const user: User = {
+
+        const user: UserAuth = {
             bio: userData?.bio ?? '',
             email: userData.email,
             image: userData?.image ?? '',
