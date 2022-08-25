@@ -1,60 +1,57 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Collection, Db } from 'mongodb';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { UserDocument } from 'src/users/models/user.model';
 import { UsersService } from 'src/users/users.service';
-import { FollowerData } from './models/follower.model';
+import { Follower, FollowerDocument } from './models/follower.model';
 import { Profile } from './models/profile.model';
 
 @Injectable()
 export class ProfilesService {
 
-    followerCollection: Collection<FollowerData>;
 
     constructor(
-        @Inject('DATABASE_CONNECTION')
-        private db: Db,
+        @InjectModel(Follower.name) private followerModel: Model<FollowerDocument>,
         private userService: UsersService
-    ) {
-        this.followerCollection = db.collection('followers');
+    ) { }
+
+    async findProfileByUsername(username: string, requesterId: string): Promise<Profile> {
+        const user = await this.userService.findByUsername(username);
+        const isFollower = await this.followerModel.findOne({ followingId: (user as UserDocument)._id, followerId : requesterId});
+
+        return {
+            username: user.username,
+            bio: user.bio ?? '',
+            image: user.image ?? '',
+            following: isFollower != null
+        }
     }
 
-    // async findProfileByUsername(username: string, requesterUsername: string): Promise<Profile> {
-    //     const user = await this.userService.findByUsername(username);
-    //     const isFollower = await this.followerCollection.findOne({ followUsername: username, followerUsername: requesterUsername });
+    async follow(username: string, followerId: string): Promise<Profile> {
+        // check if user exists
+        const user = await this.userService.findByUsername(username);
 
-    //     return {
-    //         username: user.username,
-    //         bio: user.bio ?? '',
-    //         image: user.image ?? '',
-    //         following: isFollower != null
-    //     }
-    // }
+        await new this.followerModel({followerId, followingId : (user as UserDocument)._id}).save();
 
-    // async follow(username: string, followerUsername: string): Promise<Profile> {
-    //     // check if user exists
-    //     const user = await this.userService.findByUsername(username);
+        return {
+            bio: user.bio ?? '',
+            image: user.image ?? '',
+            username: user.username,
+            following: true
+        }
+    }
 
-    //     await this.followerCollection.insertOne({ followUsername: username, followerUsername });
+    async unfollow(username: string, followerId: string): Promise<Profile> {
+        const user = await this.userService.findByUsername(username);
 
-    //     return {
-    //         bio: user.bio ?? '',
-    //         image: user.image ?? '',
-    //         username: user.username,
-    //         following: true
-    //     }
-    // }
+        await this.followerModel.deleteOne({followerId, followingId : (user as UserDocument)._id })
 
-    // async unfollow(username: string, followerUsername: string): Promise<Profile> {
-    //     const user = await this.userService.findByUsername(username);
-
-    //     const followerData = await this.followerCollection.findOneAndDelete({ followUsername: username, followerUsername });
-    //     console.log(followerData);
-
-    //     return {
-    //         bio: user.bio ?? '',
-    //         image: user.image ?? '',
-    //         username: user.username,
-    //         following: false
-    //     }
-    // }
+        return {
+            bio: user.bio ?? '',
+            image: user.image ?? '',
+            username: user.username,
+            following: false
+        }
+    }
 
 }
