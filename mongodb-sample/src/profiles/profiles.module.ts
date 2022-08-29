@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from 'src/users/models/user.model';
 import { UsersModule } from 'src/users/users.module';
-import { Follower, FollowerSchema } from './models/follower.model';
 import { ProfilesController } from './profiles.controller';
 import { ProfilesService } from './profiles.service';
 
@@ -10,7 +10,7 @@ import { ProfilesService } from './profiles.service';
   providers: [ProfilesService],
   imports: [
     UsersModule,
-    MongooseModule.forFeature([{ name: Follower.name, schema: FollowerSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
   ],
   exports : [ProfilesService]
 })

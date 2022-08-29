@@ -16,7 +16,6 @@ export class ProfilesController {
         @Param('username') username : string,
         @Request() req
     ) {
-        console.log(req.user)
         return await this.profileService.findProfileByUsername(username, req.user.id);
     }
 

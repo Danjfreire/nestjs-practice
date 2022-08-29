@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsOptional, IsString } from "class-validator";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
+import { Article } from "src/articles/models/article.model";
 
 
 export type UserDocument = User & Document;
@@ -14,6 +15,12 @@ export class User {
     @Prop({ required: true, unique: true })
     username: string;
 
+    @Prop([{type : mongoose.Schema.Types.ObjectId, ref : 'User'}])
+    following : string[];
+
+    @Prop([{type : mongoose.Schema.Types.ObjectId, ref : 'Article'}])
+    favorites : string[];
+
     @Prop()
     bio: string;
 
@@ -22,9 +29,21 @@ export class User {
 
     @Prop({ required: true })
     password: string;
+
+    toProfile : Function;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.methods.toProfile = function(referenceUserId) {
+    return {
+        username: this.username,
+        bio: this.bio ?? '',
+        image: this.image ?? '',
+        following: this.following.includes(referenceUserId)
+    }
+}
+
 
 export interface UserAuth {
     email: string;
@@ -33,8 +52,6 @@ export interface UserAuth {
     bio?: string;
     image?: string;
 }
-
-
 
 export class CreateUserDto {
 
@@ -69,5 +86,6 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     image?: string;
+    
 
 }

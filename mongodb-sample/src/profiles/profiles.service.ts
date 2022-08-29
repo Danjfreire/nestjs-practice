@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserDocument } from 'src/users/models/user.model';
+import { User, UserDocument } from 'src/users/models/user.model';
 import { UsersService } from 'src/users/users.service';
-import { Follower, FollowerDocument } from './models/follower.model';
+// import { Follower, FollowerDocument } from './models/follower.model';
 import { Profile } from './models/profile.model';
 
 @Injectable()
@@ -11,13 +11,13 @@ export class ProfilesService {
 
 
     constructor(
-        @InjectModel(Follower.name) private followerModel: Model<FollowerDocument>,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
         private userService: UsersService
     ) { }
 
-    async findProfileById(userId : string, requesterId : string) : Promise<Profile> {
+    async findProfileById(userId: string, requesterId: string): Promise<Profile> {
         const user = await this.userService.findById(userId);
-        const isFollower = await this.followerModel.findOne({ followingId: (user as UserDocument)._id, followerId : requesterId}, '-_id');
+        const isFollower = user.following.includes(userId)
 
         return {
             username: user.username,
@@ -28,47 +28,35 @@ export class ProfilesService {
     }
 
     async findProfileByUsername(username: string, requesterId: string): Promise<Profile> {
+        const currentUser = await this.userService.findById(requesterId);
         const user = await this.userService.findByUsername(username);
-        const isFollower = await this.followerModel.findOne({ followingId: (user as UserDocument)._id, followerId : requesterId});
 
-        return {
-            username: user.username,
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            following: isFollower != null
-        }
+        return currentUser.toProfile((user as UserDocument)._id);
     }
 
-    async getFollowersById(userId : string) {
-        const res = (await this.followerModel.find({followingId : userId})).map((res) => res.followerId);
-        return res;
-    }
-
-    async follow(username: string, followerId: string): Promise<Profile> {
+    async follow(username: string, currentUserId: string): Promise<Profile> {
         // check if user exists
         const user = await this.userService.findByUsername(username);
 
-        await new this.followerModel({followerId, followingId : (user as UserDocument)._id}).save();
+        const updatedUser = await this.userModel.findOneAndUpdate(
+            { _id: currentUserId },
+            { $push: { following: (user as UserDocument)._id } },
+            { new: true }
+        );
 
-        return {
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            username: user.username,
-            following: true
-        }
+        return updatedUser.toProfile((user as UserDocument)._id);
     }
 
-    async unfollow(username: string, followerId: string): Promise<Profile> {
+    async unfollow(username: string, currentUserId: string): Promise<Profile> {
         const user = await this.userService.findByUsername(username);
 
-        await this.followerModel.deleteOne({followerId, followingId : (user as UserDocument)._id })
+        const updatedUser = await this.userModel.findOneAndUpdate(
+            { _id: currentUserId },
+            { $pull: { following: (user as UserDocument)._id } },
+            { new: true }
+        );
 
-        return {
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            username: user.username,
-            following: false
-        }
+        return updatedUser.toProfile((user as UserDocument)._id);
     }
 
 }
