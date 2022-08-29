@@ -13,10 +13,10 @@ export type FollowerDocument = Follower & mongoose.Document;
 export class Follower {
 
     @Prop({ required: true, index: true, type : mongoose.Schema.Types.ObjectId, ref : 'User' })
-    followerId: User;
+    followerId: string;
 
     @Prop({ required: true, index: true, type : mongoose.Schema.Types.ObjectId, ref : 'User' })
-    followingId: User;
+    followingId: string;
 }
 
 export const FollowerSchema = SchemaFactory.createForClass(Follower);

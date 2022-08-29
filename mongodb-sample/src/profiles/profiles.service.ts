@@ -39,6 +39,11 @@ export class ProfilesService {
         }
     }
 
+    async getFollowersById(userId : string) {
+        const res = (await this.followerModel.find({followingId : userId})).map((res) => res.followerId);
+        return res;
+    }
+
     async follow(username: string, followerId: string): Promise<Profile> {
         // check if user exists
         const user = await this.userService.findByUsername(username);

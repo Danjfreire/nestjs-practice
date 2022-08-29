@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsString } from "class-validator";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export type ArticleDocument = Article & Document;
 
@@ -55,37 +55,6 @@ export class FavoriteArticle {
 
 export const FavoriteArticleSchema = SchemaFactory.createForClass(FavoriteArticle)
 
-
-// export interface ArticleData {
-//     slug: string;
-//     title: string;
-//     description: string;
-//     body: string;
-//     tagList: string[];
-//     createdAt: string;
-//     updatedAt: string;
-//     favoritesCount: number;
-//     author : string;
-// }
-
-// export interface Article {
-//     slug: string;
-//     title: string;
-//     description: string;
-//     body: string;
-//     tagList: string[];
-//     createdAt: string;
-//     updatedAt: string;
-//     favorited: boolean;
-//     favoritesCount: number;
-//     author: {
-//         username: string;
-//         bio: string;
-//         image: string;
-//         following: false;
-//     }
-// }
-
 export class CreateArticleDto {
 
     @IsString()
@@ -99,5 +68,16 @@ export class CreateArticleDto {
 
     @IsString({ each: true })
     tagList: string[];
+}
 
+export interface ArticleQueryParams {
+    favorited ?: string,
+    author ?: string,
+    tag ?: string
+}
+
+export interface ArticleQueryOptions {
+    query : ArticleQueryParams,
+    limit : number,
+    offset : number,
 }
