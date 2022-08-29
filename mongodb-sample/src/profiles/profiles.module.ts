@@ -11,6 +11,7 @@ import { ProfilesService } from './profiles.service';
   imports: [
     UsersModule,
     MongooseModule.forFeature([{ name: Follower.name, schema: FollowerSchema }])
-  ]
+  ],
+  exports : [ProfilesService]
 })
 export class ProfilesModule { }

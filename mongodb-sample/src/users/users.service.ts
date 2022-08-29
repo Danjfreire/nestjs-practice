@@ -33,6 +33,16 @@ export class UsersService {
         return await this.authService.login({ email: data.email, password: data.password });
     }
 
+    async findById(id : string) : Promise<User> {
+        const user = await this.userModel.findOne({ _id : id });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
+    }
+
     async findByUsername(username: string): Promise<User> {
 
         const user = await this.userModel.findOne({ username });

@@ -15,6 +15,18 @@ export class ProfilesService {
         private userService: UsersService
     ) { }
 
+    async findProfileById(userId : string, requesterId : string) : Promise<Profile> {
+        const user = await this.userService.findById(userId);
+        const isFollower = await this.followerModel.findOne({ followingId: (user as UserDocument)._id, followerId : requesterId}, '-_id');
+
+        return {
+            username: user.username,
+            bio: user.bio ?? '',
+            image: user.image ?? '',
+            following: isFollower != null
+        }
+    }
+
     async findProfileByUsername(username: string, requesterId: string): Promise<Profile> {
         const user = await this.userService.findByUsername(username);
         const isFollower = await this.followerModel.findOne({ followingId: (user as UserDocument)._id, followerId : requesterId});
