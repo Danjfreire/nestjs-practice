@@ -35,12 +35,12 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.methods.toProfile = function(referenceUserId) {
+UserSchema.methods.toProfile = function(referenceUser : UserDocument) {
     return {
         username: this.username,
         bio: this.bio ?? '',
         image: this.image ?? '',
-        following: this.following.includes(referenceUserId)
+        following: referenceUser.following.includes(this._id),
     }
 }
 

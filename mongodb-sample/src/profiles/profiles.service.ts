@@ -15,23 +15,11 @@ export class ProfilesService {
         private userService: UsersService
     ) { }
 
-    async findProfileById(userId: string, requesterId: string): Promise<Profile> {
-        const user = await this.userService.findById(userId);
-        const isFollower = user.following.includes(userId)
-
-        return {
-            username: user.username,
-            bio: user.bio ?? '',
-            image: user.image ?? '',
-            following: isFollower != null
-        }
-    }
-
     async findProfileByUsername(username: string, requesterId: string): Promise<Profile> {
         const currentUser = await this.userService.findById(requesterId);
         const user = await this.userService.findByUsername(username);
 
-        return currentUser.toProfile((user as UserDocument)._id);
+        return user.toProfile((currentUser as UserDocument));
     }
 
     async follow(username: string, currentUserId: string): Promise<Profile> {
@@ -44,7 +32,7 @@ export class ProfilesService {
             { new: true }
         );
 
-        return updatedUser.toProfile((user as UserDocument)._id);
+        return updatedUser.toProfile((user as UserDocument));
     }
 
     async unfollow(username: string, currentUserId: string): Promise<Profile> {
@@ -56,7 +44,7 @@ export class ProfilesService {
             { new: true }
         );
 
-        return updatedUser.toProfile((user as UserDocument)._id);
+        return updatedUser.toProfile((user as UserDocument));
     }
 
 }
