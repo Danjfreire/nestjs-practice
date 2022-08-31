@@ -33,8 +33,8 @@ export class UsersService {
         return await this.authService.login({ email: data.email, password: data.password });
     }
 
-    async findById(id : string) : Promise<User> {
-        const user = await this.userModel.findOne({ _id : id });
+    async findById(id: string): Promise<User> {
+        const user = await this.userModel.findOne({ _id: id });
 
         if (!user) {
             throw new NotFoundException('User not found');
@@ -71,9 +71,17 @@ export class UsersService {
             data.password = await this.authService.hashPassword(data.password);
         }
 
-        const user = await this.userModel.findOneAndUpdate({ email }, data, {new : true})
+        const user = await this.userModel.findOneAndUpdate({ email }, data, { new: true })
 
         return user;
+    }
+
+    async addFavoriteArticle(userId: string, articleId: string): Promise<User> {
+        return await this.userModel.findOneAndUpdate({ _id: userId }, { $addToSet: { favorites: articleId } }, { new: true })
+    }
+
+    async removeFavoriteArticle(userId: string, articleId : string) : Promise<User> {
+        return await this.userModel.findOneAndUpdate({_id : userId}, { $pull: { favorites: articleId} }, {new : true});
     }
 
 }

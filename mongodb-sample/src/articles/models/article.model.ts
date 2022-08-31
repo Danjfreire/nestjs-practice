@@ -44,6 +44,7 @@ export class Article {
 export const ArticleSchema = SchemaFactory.createForClass(Article);
 
 ArticleSchema.methods.toJson = function (requesterUser: UserDocument) {
+    console.log(requesterUser.favorites);
     return {
         author: this.author.toProfile(requesterUser),
         body: this.body,

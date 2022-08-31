@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserDocument } from 'src/users/models/user.model';
@@ -126,20 +126,48 @@ export class ArticlesService {
         const updatedArticle = await (await article.save()).populate('author');
 
         return {
-            article : updatedArticle.toJson(user)
+            article: updatedArticle.toJson(user)
         }
     }
 
-    async deleteArticle(slug : string, requesterId) {
+    async deleteArticle(slug: string, requesterId: string) {
         const article = await this.articleModel.findOne({ slug })
         const user = await this.userService.findById(requesterId);
 
-        
+
         if ((article.author as any).toString() !== ((user as UserDocument)._id).toString()) {
             throw new ForbiddenException('User does not have access to article');
         }
 
         return await article.delete();
+    }
+
+    async favoriteArticle(slug: string, requesterId: string) {
+        const article = await this.articleModel.findOne({ slug }).populate('author')
+
+        if (!article) {
+            throw new NotFoundException('Article not found');
+        }
+
+        const user = await this.userService.addFavoriteArticle(requesterId, (article as ArticleDocument)._id);
+
+        return {
+            article: article.toJson(user),
+        }
+    }
+
+    async unfavoriteArticle(slug: string, requesterId: string) {
+        const article = await this.articleModel.findOne({ slug }).populate('author');
+
+        if(!article) {
+            throw new NotFoundException('Article not found');
+        }
+
+        const user = await this.userService.removeFavoriteArticle(requesterId, (article as ArticleDocument)._id);
+
+        return {
+            article: article.toJson(user),
+        }
     }
 
     private getTitleSlug(title: string) {

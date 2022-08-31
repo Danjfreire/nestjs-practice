@@ -28,7 +28,7 @@ export class ProfilesService {
 
         const updatedUser = await this.userModel.findOneAndUpdate(
             { _id: currentUserId },
-            { $push: { following: (user as UserDocument)._id } },
+            { $addToSet: { following: (user as UserDocument)._id } },
             { new: true }
         );
 
