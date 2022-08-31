@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 import mongoose, { Document } from "mongoose";
 import { User, UserDocument } from "src/users/models/user.model";
 
@@ -43,7 +43,7 @@ export class Article {
 
 export const ArticleSchema = SchemaFactory.createForClass(Article);
 
-ArticleSchema.methods.toJson = function(requesterUser : UserDocument) {
+ArticleSchema.methods.toJson = function (requesterUser: UserDocument) {
     return {
         author: this.author.toProfile(requesterUser),
         body: this.body,
@@ -74,6 +74,21 @@ export class CreateArticleDto {
     tagList: string[];
 }
 
+export class UpdateArticleDto {
+
+    @IsString()
+    @IsOptional()
+    title?: string;
+
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @IsString()
+    @IsOptional()
+    body?: string;
+}
+
 export interface ArticleQueryParams {
     favorited?: string,
     author?: string,
@@ -81,7 +96,7 @@ export interface ArticleQueryParams {
 }
 
 export interface ArticleQueryOptions {
-    query: ArticleQueryParams,
+    query?: ArticleQueryParams,
     limit: number,
     offset: number,
 }
