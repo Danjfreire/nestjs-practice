@@ -98,12 +98,16 @@ export class ArticlesService {
         return res;
     }
 
-    async getArticle(slug: string, requesterId?: string) {
-        const user = await this.userService.findById(requesterId);
-        const article = await this.articleModel.findOne({ slug }, '-_id -__v')
-            .populate('author');
+    async findArticle(slug : string) {
+        return await this.articleModel.findOne({ slug })
+    }
 
-        return article.toJson((user as UserDocument));
+    async getArticle(slug: string, requesterId?: string) {
+        const user = requesterId ? await this.userService.findById(requesterId) : null;
+        const article = await this.findArticle(slug)
+        const populatedArticle = await article.populate('author');
+
+        return populatedArticle.toJson((user as UserDocument));
     }
 
     async updateArticle(slug: string, data: UpdateArticleDto, requesterId: string) {

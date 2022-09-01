@@ -44,15 +44,14 @@ export class Article {
 export const ArticleSchema = SchemaFactory.createForClass(Article);
 
 ArticleSchema.methods.toJson = function (requesterUser: UserDocument) {
-    console.log(requesterUser.favorites);
     return {
         author: this.author.toProfile(requesterUser),
         body: this.body,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         description: this.description,
-        favoriteCount: this.favoriteCount,
-        favorited: requesterUser.favorites.includes(this._id),
+        favoritesCount: this.favoritesCount,
+        favorited: requesterUser ? requesterUser.favorites.includes(this._id) : false,
         slug: this.slug,
         tagList: this.tagList,
         title: this.title,

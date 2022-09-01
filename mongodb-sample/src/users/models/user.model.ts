@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsEmail, IsOptional, IsString } from "class-validator";
 import mongoose, { Document } from "mongoose";
-import { Article } from "src/articles/models/article.model";
 
 
 export type UserDocument = User & Document;
@@ -40,7 +39,7 @@ UserSchema.methods.toProfile = function(referenceUser : UserDocument) {
         username: this.username,
         bio: this.bio ?? '',
         image: this.image ?? '',
-        following: referenceUser.following.includes(this._id),
+        following: referenceUser ? referenceUser.following.includes(this._id) : false,
     }
 }
 

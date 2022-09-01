@@ -80,8 +80,8 @@ export class UsersService {
         return await this.userModel.findOneAndUpdate({ _id: userId }, { $addToSet: { favorites: articleId } }, { new: true })
     }
 
-    async removeFavoriteArticle(userId: string, articleId : string) : Promise<User> {
-        return await this.userModel.findOneAndUpdate({_id : userId}, { $pull: { favorites: articleId} }, {new : true});
+    async removeFavoriteArticle(userId: string, articleId: string): Promise<User> {
+        return await this.userModel.findOneAndUpdate({ _id: userId }, { $pull: { favorites: articleId } }, { new: true });
     }
 
 }

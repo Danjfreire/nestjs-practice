@@ -9,12 +9,13 @@ import { Article, ArticleSchema } from './models/article.model';
 @Module({
   controllers: [ArticlesController],
   providers: [ArticlesService],
-  imports : [
+  imports: [
     UsersModule,
     ProfilesModule,
     MongooseModule.forFeature([
-      {name : Article.name, schema : ArticleSchema},
+      { name: Article.name, schema: ArticleSchema },
     ])
-  ]
+  ],
+  exports: [ArticlesService]
 })
-export class ArticlesModule {}
+export class ArticlesModule { }
