@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/co
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { LoginDto } from 'src/auth/models/login.model';
+import { LoginDto } from 'src/auth/models/login.dto';
 import { CreateUserDto, UpdateUserDto, User, UserAuth } from './models/user.model';
 import { UsersService } from './users.service';
 
@@ -18,7 +18,7 @@ export class UsersController {
     async login(
         @Body() data: LoginDto
     ): Promise<UserAuth> {
-        return await this.authService.login(data);
+        return await this.authService.login(data.user.email, data.user.password);
     }
 
     @Post()

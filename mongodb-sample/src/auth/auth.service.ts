@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User, UserAuth, UserDocument } from 'src/users/models/user.model';
 import * as argon2 from "argon2";
 import { UsersService } from 'src/users/users.service';
-import { LoginDto } from './models/login.model';
+import { LoginDto } from './models/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -24,8 +24,8 @@ export class AuthService {
         return user;
     }
 
-    async login(data: LoginDto): Promise<UserAuth> {
-        const user = await this.validateUser(data.email, data.password);
+    async login(email : string, password : string): Promise<UserAuth> {
+        const user = await this.validateUser(email, password);
         const payload = { email: user.email, username: user.username, sub: (user as UserDocument)._id }
         const token = this.jwtService.sign(payload);
 

@@ -30,7 +30,7 @@ export class UsersService {
             }
         }
 
-        return await this.authService.login({ email: data.email, password: data.password });
+        return await this.authService.login(data.email, data.password );
     }
 
     async findById(id: string): Promise<User> {
