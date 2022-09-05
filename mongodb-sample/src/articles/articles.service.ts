@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserDocument } from 'src/users/models/user.model';
@@ -98,7 +98,7 @@ export class ArticlesService {
         return res;
     }
 
-    async findArticle(slug : string) {
+    async findArticle(slug: string) {
         return await this.articleModel.findOne({ slug })
     }
 
@@ -147,30 +147,54 @@ export class ArticlesService {
     }
 
     async favoriteArticle(slug: string, requesterId: string) {
-        const article = await this.articleModel.findOne({ slug }).populate('author')
+        const [user, article] = await Promise.all([
+            this.userService.findById(requesterId),
+            this.articleModel.findOne({ slug }).populate('author')
+        ]);
 
         if (!article) {
             throw new NotFoundException('Article not found');
         }
 
-        const user = await this.userService.addFavoriteArticle(requesterId, (article as ArticleDocument)._id);
+        if(user.favorites.includes((article as ArticleDocument)._id)) {
+            throw new BadRequestException('Article already favorited');
+        }
+
+        article.favoritesCount++;
+
+        const [updatedUser, updatedArticle] = await Promise.all([
+            this.userService.addFavoriteArticle(requesterId, (article as ArticleDocument)._id),
+            (await article.save()).populate('author')
+        ]);
 
         return {
-            article: article.toJson(user),
+            article: updatedArticle.toJson(updatedUser),
         }
     }
 
     async unfavoriteArticle(slug: string, requesterId: string) {
-        const article = await this.articleModel.findOne({ slug }).populate('author');
+        const [user, article] = await Promise.all([
+            this.userService.findById(requesterId),
+            this.articleModel.findOne({ slug }).populate('author')
+        ]);
 
-        if(!article) {
+        if (!article) {
             throw new NotFoundException('Article not found');
         }
 
-        const user = await this.userService.removeFavoriteArticle(requesterId, (article as ArticleDocument)._id);
+        if(!user.favorites.includes((article as ArticleDocument)._id)) {
+            throw new BadRequestException('Article is not favorited by user');
+        }
+
+        article.favoritesCount--;
+
+        const [updatedUser, updatedArticle] = await Promise.all([
+            this.userService.removeFavoriteArticle(requesterId, (article as ArticleDocument)._id),
+            (await article.save()).populate('author')
+        ]);
 
         return {
-            article: article.toJson(user),
+            article: updatedArticle.toJson(updatedUser),
         }
     }
 

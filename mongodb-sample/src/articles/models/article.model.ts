@@ -33,7 +33,7 @@ export class Article {
     favorited: boolean;
 
     @Prop()
-    favoriteCount: number;
+    favoritesCount: number;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     author: User;
