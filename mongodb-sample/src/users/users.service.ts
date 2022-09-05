@@ -1,8 +1,10 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto, User, UserAuth, UserDocument } from './models/user.model';
+import { User, UserDocument } from './models/user.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CreateUserDto, UpdateUserDto, UserRegistrationData } from './models/user.dto';
+import { UserAuth } from 'src/auth/models/user-auth.model';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +16,7 @@ export class UsersService {
     ) {
     }
 
-    async register(data: CreateUserDto): Promise<UserAuth> {
+    async register(data: UserRegistrationData): Promise<UserAuth> {
 
         try {
             const hashedPassword = await this.authService.hashPassword(data.password);
@@ -30,7 +32,7 @@ export class UsersService {
             }
         }
 
-        return await this.authService.login(data.email, data.password );
+        return await this.authService.login(data.email, data.password);
     }
 
     async findById(id: string): Promise<User> {

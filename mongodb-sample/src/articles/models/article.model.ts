@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsOptional, IsString } from "class-validator";
 import mongoose, { Document } from "mongoose";
-import { User, UserDocument } from "src/users/models/user.model";
+import { User, UserDocument } from "src/users/models/user.schema";
 
 export type ArticleDocument = Article & Document;
 
