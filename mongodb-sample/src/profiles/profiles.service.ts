@@ -15,14 +15,16 @@ export class ProfilesService {
         private userService: UsersService
     ) { }
 
-    async findProfileByUsername(username: string, requesterId: string): Promise<Profile> {
+    async findProfileByUsername(username: string, requesterId: string) : Promise<{profile : Profile}> {
         const currentUser = await this.userService.findById(requesterId);
         const user = await this.userService.findByUsername(username);
 
-        return user.toProfile((currentUser as UserDocument));
+        return {
+            profile : user.toProfile((currentUser as UserDocument))
+        };
     }
 
-    async follow(username: string, currentUserId: string): Promise<Profile> {
+    async follow(username: string, currentUserId: string): Promise<{profile : Profile}> {
         // check if user exists
         const user = await this.userService.findByUsername(username);
 
@@ -32,10 +34,12 @@ export class ProfilesService {
             { new: true }
         );
 
-        return updatedUser.toProfile((user as UserDocument));
+        return {
+            profile: updatedUser.toProfile((user as UserDocument))
+        };
     }
 
-    async unfollow(username: string, currentUserId: string): Promise<Profile> {
+    async unfollow(username: string, currentUserId: string): Promise<{profile : Profile}> {
         const user = await this.userService.findByUsername(username);
 
         const updatedUser = await this.userModel.findOneAndUpdate(
@@ -44,7 +48,9 @@ export class ProfilesService {
             { new: true }
         );
 
-        return updatedUser.toProfile((user as UserDocument));
+        return {
+            profile : updatedUser.toProfile((user as UserDocument))
+        };
     }
 
 }
