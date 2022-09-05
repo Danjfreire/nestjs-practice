@@ -51,7 +51,7 @@ export class UsersController {
         @Body() data: UpdateUserDto,
         @Request() req
     ): Promise<UserAuth> {
-        const userData = await this.userService.update(req.user.email, data);
+        const userData = await this.userService.update(req.user.email, data.user);
 
         const user: UserAuth = {
             bio: userData?.bio ?? '',

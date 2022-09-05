@@ -22,8 +22,8 @@ export class CreateUserDto {
     user : UserRegistrationData
 }
 
-export class UpdateUserDto {
 
+export class UserUpdateData {
     @IsOptional()
     @IsEmail()
     email?: string;
@@ -43,6 +43,15 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     image?: string;
-    
+}
+
+export class UpdateUserDto {
+
+    @IsDefined()
+    @IsNotEmptyObject()
+    @IsObject()
+    @ValidateNested()
+    @Type(() => UserUpdateData)
+    user : UserUpdateData
 
 }

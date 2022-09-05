@@ -3,7 +3,7 @@ import { User, UserDocument } from './models/user.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateUserDto, UpdateUserDto, UserRegistrationData } from './models/user.dto';
+import { CreateUserDto, UpdateUserDto, UserRegistrationData, UserUpdateData } from './models/user.dto';
 import { UserAuth } from 'src/auth/models/user-auth.model';
 
 @Injectable()
@@ -67,7 +67,7 @@ export class UsersService {
         return user;
     }
 
-    async update(email: string, data: UpdateUserDto): Promise<User> {
+    async update(email: string, data: UserUpdateData): Promise<User> {
 
         if (data.password) {
             data.password = await this.authService.hashPassword(data.password);
