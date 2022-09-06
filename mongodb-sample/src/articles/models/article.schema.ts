@@ -38,12 +38,12 @@ export class Article {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     author: User;
 
-    toJson: Function
+    toArticle: Function
 }
 
 export const ArticleSchema = SchemaFactory.createForClass(Article);
 
-ArticleSchema.methods.toJson = function (requesterUser: UserDocument) {
+ArticleSchema.methods.toArticle = function (requesterUser: UserDocument) {
     return {
         author: this.author.toProfile(requesterUser),
         body: this.body,
@@ -58,45 +58,3 @@ ArticleSchema.methods.toJson = function (requesterUser: UserDocument) {
     }
 }
 
-
-export class CreateArticleDto {
-
-    @IsString()
-    title: string;
-
-    @IsString()
-    description: string;
-
-    @IsString()
-    body: string;
-
-    @IsString({ each: true })
-    tagList: string[];
-}
-
-export class UpdateArticleDto {
-
-    @IsString()
-    @IsOptional()
-    title?: string;
-
-    @IsString()
-    @IsOptional()
-    description?: string;
-
-    @IsString()
-    @IsOptional()
-    body?: string;
-}
-
-export interface ArticleQueryParams {
-    favorited?: string,
-    author?: string,
-    tag?: string
-}
-
-export interface ArticleQueryOptions {
-    query?: ArticleQueryParams,
-    limit: number,
-    offset: number,
-}

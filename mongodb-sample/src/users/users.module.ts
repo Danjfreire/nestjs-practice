@@ -4,9 +4,10 @@ import { AuthModule } from 'src/auth/auth.module';
 import { User, UserSchema } from './models/user.schema';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { UserController } from './user.controller';
 
 @Module({
-  controllers: [UsersController],
+  controllers: [UsersController, UserController],
   providers: [UsersService],
   imports: [
     forwardRef(() => AuthModule),

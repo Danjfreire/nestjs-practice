@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IsEmail, IsOptional, IsString } from "class-validator";
 import mongoose, { Document } from "mongoose";
 
 

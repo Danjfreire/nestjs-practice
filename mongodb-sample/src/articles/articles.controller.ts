@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
-import { Article, ArticleQueryOptions, CreateArticleDto, UpdateArticleDto } from './models/article.model';
+import { ArticleQueryOptions, CreateArticleDto, UpdateArticleDto } from './models/article.dto';
+import { Article } from './models/article.schema';
 
 @Controller('articles')
 export class ArticlesController {
@@ -12,16 +13,17 @@ export class ArticlesController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async asynccreateArticle(
+    async createArticle(
         @Request() req,
         @Body() data: CreateArticleDto
-    ): Promise<Article> {
+    ) {
         const userId = req.user.id;
 
-        console.log(data)
-        console.log(userId)
+        const res = await this.articleService.createArticle(userId, data.article);
 
-        return await this.articleService.createArticle(userId, data);
+        return {
+            article : res
+        }
     }
 
     @UseGuards(JwtAuthGuard)
@@ -44,9 +46,12 @@ export class ArticlesController {
     async getArticle(
         @Request() req,
         @Param('slug') slug: string,
-    ): Promise<Article> {
-        console.log(req.user)
-        return await this.articleService.getArticle(slug, req.user.id);
+    ) {
+        const res = await this.articleService.getArticle(slug, req.user.id);
+
+        return {
+            article: res
+        }
     }
 
     @UseGuards(JwtAuthGuard)
@@ -76,7 +81,11 @@ export class ArticlesController {
         @Body() data: UpdateArticleDto,
         @Request() req
     ) {
-        return await this.articleService.updateArticle(slug, data, req.user.id);
+        const res =  await this.articleService.updateArticle(slug, data.article, req.user.id);
+
+        return {
+            article : res
+        }
     }
 
     @UseGuards(JwtAuthGuard)
@@ -91,19 +100,27 @@ export class ArticlesController {
     @UseGuards(JwtAuthGuard)
     @Post(':slug/favorite')
     async favoriteArticle(
-        @Param('slug') slug : string,
+        @Param('slug') slug: string,
         @Request() req
     ) {
-        return await this.articleService.favoriteArticle(slug, req.user.id);
+        const res = await this.articleService.favoriteArticle(slug, req.user.id);
+
+        return {
+            article : res
+        }
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete(':slug/favorite')
     async unfavoriteArticle(
-        @Param('slug') slug : string,
+        @Param('slug') slug: string,
         @Request() req
     ) {
-        return await this.articleService.unfavoriteArticle(slug, req.user.id);
+        const res = await this.articleService.unfavoriteArticle(slug, req.user.id);
+
+        return {
+            article : res
+        }
     }
 
 
