@@ -19,7 +19,6 @@ export class CommentsController {
         @Request() req 
     ) {
         //check if
-        console.log(req.user)
         const comment = await this.commentsService.addComment(data.comment, slug, req.user.id);
 
         return {

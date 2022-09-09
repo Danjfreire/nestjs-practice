@@ -34,55 +34,65 @@ export class ArticlesService {
         return (await article.populate('author')).toArticle(user);
     }
 
-    async listArticles(queryOptions: ArticleQueryOptions, requesterId?: string) : Promise<{articlesCount : number, articles : Article[]}> {
+    async listArticles(queryOptions: ArticleQueryOptions, requesterId?: string): Promise<{ articlesCount: number, articles: Article[] }> {
 
         let query: any = {};
 
-        const [
-            author,
-            requester,
-        ] = await Promise.all([
-            queryOptions.query.author ? this.userService.findByUsername(queryOptions.query.author) : null,
-            requesterId ? this.userService.findById(requesterId) : null,
-        ]);
+        try {
+            const [
+                author,
+                requester,
+            ] = await Promise.all([
+                queryOptions.query.author ? this.userService.findByUsername(queryOptions.query.author) : null,
+                requesterId ? this.userService.findById(requesterId) : null,
+            ]);
 
-        if (author) {
-            query.author = (author as UserDocument)._id;
+            if (author) {
+                query.author = (author as UserDocument)._id;
+            }
+
+            if (queryOptions.query.tag != null) {
+                query.tagList = queryOptions.query.tag
+            }
+
+            const [
+                articlesCount,
+                articles
+            ] = await Promise.all([
+                this.articleModel.count(query).exec(),
+                this.articleModel.find(query)
+                    .sort({ createdAt: 'desc' })
+                    .skip(queryOptions.offset)
+                    .limit(queryOptions.limit)
+                    .populate('author')
+            ])
+
+            const res = {
+                articlesCount,
+                articles: articles.map(article => {
+                    return article.toArticle(requester)
+                })
+            }
+
+            return res;
+        } catch (error) {
+            if (error.response.statusCode === 404 && error.response.message === "User not found") {
+                console.log('Entrou')
+                return {
+                    articles: [],
+                    articlesCount: 0
+                }
+            }
         }
-
-        if (queryOptions.query.tag != null) {
-            query.tagList = queryOptions.query.tag
-        }
-
-        const [
-            articlesCount,
-            articles
-        ] = await Promise.all([
-            this.articleModel.count(query).exec(),
-            this.articleModel.find(query)
-                .sort({ createdAt: 'desc' })
-                .skip(queryOptions.offset)
-                .limit(queryOptions.limit)
-                .populate('author')
-        ])
-
-        const res = {
-            articlesCount,
-            articles: articles.map(article => {
-                return article.toArticle(requester)
-            })
-        }
-
-        return res;
     }
 
-    async getArticlesFeed(queryOptions: ArticleQueryOptions, requesterId: string): Promise<{articleCount : number, articles : Article[]}> {
+    async getArticlesFeed(queryOptions: ArticleQueryOptions, requesterId: string): Promise<{ articlesCount: number, articles: Article[] }> {
         // get articles created by followed users
         const user = await this.userService.findById(requesterId);
 
         const followed = user.following;
 
-        const [articleCount, articles] = await Promise.all([
+        const [articlesCount, articles] = await Promise.all([
             this.articleModel.count({ author: { $in: followed } }).exec(),
             this.articleModel.find({ author: { $in: followed } })
                 .sort({ createdAt: 'desc' })
@@ -92,7 +102,7 @@ export class ArticlesService {
         ]);
 
         const res = {
-            articleCount,
+            articlesCount,
             articles: articles.map(article => {
                 return article.toArticle(user)
             })
@@ -105,7 +115,7 @@ export class ArticlesService {
         return await this.articleModel.findOne({ slug })
     }
 
-    async getArticle(slug: string, requesterId?: string) : Promise<Article> {
+    async getArticle(slug: string, requesterId?: string): Promise<Article> {
         const user = requesterId ? await this.userService.findById(requesterId) : null;
         const article = await this.findArticle(slug)
         const populatedArticle = await article.populate('author');
@@ -113,7 +123,7 @@ export class ArticlesService {
         return populatedArticle.toArticle((user as UserDocument));
     }
 
-    async updateArticle(slug: string, data: UpdateArticleData, requesterId: string) : Promise<Article> {
+    async updateArticle(slug: string, data: UpdateArticleData, requesterId: string): Promise<Article> {
         const article = await this.articleModel.findOne({ slug })
         const user = await this.userService.findById(requesterId);
 
@@ -147,7 +157,7 @@ export class ArticlesService {
         return await article.delete();
     }
 
-    async favoriteArticle(slug: string, requesterId: string) : Promise<Article> {
+    async favoriteArticle(slug: string, requesterId: string): Promise<Article> {
         const [user, article] = await Promise.all([
             this.userService.findById(requesterId),
             this.articleModel.findOne({ slug }).populate('author')
@@ -157,7 +167,7 @@ export class ArticlesService {
             throw new NotFoundException('Article not found');
         }
 
-        if(user.favorites.includes((article as ArticleDocument)._id)) {
+        if (user.favorites.includes((article as ArticleDocument)._id)) {
             throw new BadRequestException('Article already favorited');
         }
 
@@ -181,7 +191,7 @@ export class ArticlesService {
             throw new NotFoundException('Article not found');
         }
 
-        if(!user.favorites.includes((article as ArticleDocument)._id)) {
+        if (!user.favorites.includes((article as ArticleDocument)._id)) {
             throw new BadRequestException('Article is not favorited by user');
         }
 

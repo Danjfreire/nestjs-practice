@@ -23,7 +23,6 @@ export class CommentsService {
             await this.articleService.findArticle(articleSlug)
         ])
 
-        console.log('Article id :', (article as ArticleDocument)._id)
         if (article == null) {
             throw new NotFoundException('Article not found')
         }
@@ -58,7 +57,6 @@ export class CommentsService {
     async deleteComment(commentId: string, requesterId) {
         try {
             const comment = await this.commentModel.findOne({ _id: commentId });
-            console.log(comment)
             if (!comment) {
                 throw new NotFoundException('Comment not found');
             }
