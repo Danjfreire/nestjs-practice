@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                     return jwt
                 },
             ignoreExpiration: false,
-            secretOrKey: jwtConstants.secret
+            secretOrKey: jwtConstants.secret,
         });
     }
 

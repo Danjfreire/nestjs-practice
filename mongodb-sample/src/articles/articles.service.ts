@@ -34,7 +34,7 @@ export class ArticlesService {
         return (await article.populate('author')).toArticle(user);
     }
 
-    async listArticles(queryOptions: ArticleQueryOptions, requesterId: string) : Promise<{articleCount : number, articles : Article[]}> {
+    async listArticles(queryOptions: ArticleQueryOptions, requesterId?: string) : Promise<{articlesCount : number, articles : Article[]}> {
 
         let query: any = {};
 
@@ -43,7 +43,7 @@ export class ArticlesService {
             requester,
         ] = await Promise.all([
             queryOptions.query.author ? this.userService.findByUsername(queryOptions.query.author) : null,
-            this.userService.findById(requesterId),
+            requesterId ? this.userService.findById(requesterId) : null,
         ]);
 
         if (author) {
@@ -55,7 +55,7 @@ export class ArticlesService {
         }
 
         const [
-            articleCount,
+            articlesCount,
             articles
         ] = await Promise.all([
             this.articleModel.count(query).exec(),
@@ -67,7 +67,7 @@ export class ArticlesService {
         ])
 
         const res = {
-            articleCount,
+            articlesCount,
             articles: articles.map(article => {
                 return article.toArticle(requester)
             })

@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { AnonymousAuthGuard } from 'src/auth/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
 import { ArticleQueryOptions, CreateArticleDto, UpdateArticleDto } from './models/article.dto';
-import { Article } from './models/article.schema';
 
 @Controller('articles')
 export class ArticlesController {
@@ -54,7 +54,7 @@ export class ArticlesController {
         }
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousAuthGuard)
     @Get('')
     async listArticles(
         @Query('tag') tag: string,
