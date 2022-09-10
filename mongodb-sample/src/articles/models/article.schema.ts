@@ -53,7 +53,7 @@ ArticleSchema.methods.toArticle = function (requesterUser: UserDocument) {
         favoritesCount: this.favoritesCount,
         favorited: requesterUser ? requesterUser.favorites.includes(this._id) : false,
         slug: this.slug,
-        tagList: this.tagList,
+        tagList: this.tagList.sort(),
         title: this.title,
     }
 }

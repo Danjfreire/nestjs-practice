@@ -35,7 +35,7 @@ export class ProfilesService {
         );
 
         return {
-            profile: updatedUser.toProfile((user as UserDocument))
+            profile: user.toProfile((updatedUser as UserDocument))
         };
     }
 
@@ -49,7 +49,7 @@ export class ProfilesService {
         );
 
         return {
-            profile : updatedUser.toProfile((user as UserDocument))
+            profile : user.toProfile((updatedUser as UserDocument))
         };
     }
 

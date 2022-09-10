@@ -5,6 +5,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ArticlesModule } from './articles/articles.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CommentsModule } from './comments/comments.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { CommentsModule } from './comments/comments.module';
     AuthModule,
     ProfilesModule,
     ArticlesModule,
-    CommentsModule],
+    CommentsModule,
+    TagsModule],
   providers: [],
 })
 export class AppModule { }

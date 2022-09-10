@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Request, UseGuards, HttpCode } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Profile } from './models/profile.model';
 import { ProfilesService } from './profiles.service';
@@ -19,6 +19,7 @@ export class ProfilesController {
         return await this.profileService.findProfileByUsername(username, req.user.id);
     }
 
+    @HttpCode(200)
     @UseGuards(JwtAuthGuard)
     @Post(':username/follow')
     async followProfile(

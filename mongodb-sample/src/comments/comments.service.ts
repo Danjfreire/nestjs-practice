@@ -43,9 +43,9 @@ export class CommentsService {
         return populatedComment.toJson(user)
     }
 
-    async getComments(articleSlug: string, authorId: string): Promise<Comment[]> {
+    async getComments(articleSlug: string, requesterId?: string): Promise<Comment[]> {
         const [user, article] = await Promise.all([
-            await this.userService.findById(authorId),
+            requesterId ? await this.userService.findById(requesterId) : null,
             await this.articleService.findArticle(articleSlug)
         ])
 

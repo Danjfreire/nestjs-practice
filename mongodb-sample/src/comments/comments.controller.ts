@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { ArticlesService } from 'src/articles/articles.service';
+import { AnonymousAuthGuard } from 'src/auth/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './models/comment.model';
@@ -26,7 +27,7 @@ export class CommentsController {
         }
     }    
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousAuthGuard)
     @Get('')
     async getComments(
         @Param('slug') slug : string,
