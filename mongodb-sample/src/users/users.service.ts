@@ -26,7 +26,6 @@ export class UsersService {
                 password: hashedPassword
             }).save();
         } catch (error) {
-            console.error(error);
             if (error.code === 11000) {
                 throw new BadRequestException('Email or username registered');
             }

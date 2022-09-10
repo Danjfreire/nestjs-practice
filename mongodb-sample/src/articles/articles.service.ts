@@ -77,7 +77,6 @@ export class ArticlesService {
             return res;
         } catch (error) {
             if (error.response.statusCode === 404 && error.response.message === "User not found") {
-                console.log('Entrou')
                 return {
                     articles: [],
                     articlesCount: 0
