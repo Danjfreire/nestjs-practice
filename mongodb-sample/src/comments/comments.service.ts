@@ -5,8 +5,8 @@ import { ArticlesService } from 'src/articles/articles.service';
 import { ArticleDocument } from 'src/articles/models/article.schema';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
-import { CommentDto } from './models/comment.model';
-import { Comment, CommentDocument } from './models/comment.schema';
+import { Comment, CommentDocument } from './schemas/comment.schema';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -17,7 +17,7 @@ export class CommentsService {
         private userService: UsersService,
     ) { }
 
-    async addComment(data: CommentDto, articleSlug: string, authorId: string): Promise<Comment> {
+    async addComment(data: CreateCommentDto, articleSlug: string, authorId: string): Promise<Comment> {
         const [user, article] = await Promise.all([
             await this.userService.findById(authorId),
             await this.articleService.findArticle(articleSlug)

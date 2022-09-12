@@ -1,9 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
-import { ArticlesService } from 'src/articles/articles.service';
 import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto } from './models/comment.model';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Controller('articles/:slug/comments')
 export class CommentsController {
@@ -16,11 +15,11 @@ export class CommentsController {
     @Post('')
     async addComment(
         @Param('slug') slug : string,
-        @Body() data : CreateCommentDto,
+        @Body('body') commentDto : CreateCommentDto,
         @Request() req 
     ) {
         //check if
-        const comment = await this.commentsService.addComment(data.comment, slug, req.user.id);
+        const comment = await this.commentsService.addComment(commentDto, slug, req.user.id);
 
         return {
             comment
