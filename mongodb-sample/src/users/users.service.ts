@@ -4,7 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserAuth } from 'src/auth/models/user-auth.model';
+import { UserAuth } from 'src/auth/interfaces/user-auth.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()

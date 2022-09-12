@@ -1,4 +1,4 @@
-import { UserAuth } from "src/auth/models/user-auth.model";
+import { UserAuth } from "src/auth/interfaces/user-auth.interface";
 
 export interface UserRO {
     user : UserAuth
