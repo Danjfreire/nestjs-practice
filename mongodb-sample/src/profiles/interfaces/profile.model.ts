@@ -4,3 +4,7 @@ export interface Profile {
     image : string;
     following : boolean;
 }
+
+export interface ProfileRO {
+    profile : Profile
+}

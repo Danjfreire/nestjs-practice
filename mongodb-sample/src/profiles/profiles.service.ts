@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 // import { Follower, FollowerDocument } from './models/follower.model';
-import { Profile } from './models/profile.model';
+import { Profile } from './interfaces/profile.model';
 
 @Injectable()
 export class ProfilesService {
