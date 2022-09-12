@@ -2,10 +2,10 @@ import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
-import { AnonymousStrategy } from './anonymous.strategy';
+import { AnonymousStrategy } from './strategies/anonymous.strategy';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   providers: [AuthService, JwtStrategy, AnonymousStrategy],

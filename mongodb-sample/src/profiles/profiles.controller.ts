@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Param, Post, Request, UseGuards, HttpCode } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Profile } from './models/profile.model';
 import { ProfilesService } from './profiles.service';
 

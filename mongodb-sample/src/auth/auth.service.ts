@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from 'src/users/models/user.schema';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 import * as argon2 from "argon2";
 import { UsersService } from 'src/users/users.service';
 import { UserAuth } from './models/user-auth.model';

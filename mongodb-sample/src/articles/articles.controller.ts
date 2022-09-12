@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
-import { AnonymousAuthGuard } from 'src/auth/anonymous-auth.guard';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
 import { ArticleQueryOptions, CreateArticleDto, UpdateArticleDto } from './models/article.dto';
 

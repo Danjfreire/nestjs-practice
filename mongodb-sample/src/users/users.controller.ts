@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/auth/models/login.dto';
 import { UserAuth } from 'src/auth/models/user-auth.model';
-import { CreateUserDto, UpdateUserDto } from './models/user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -16,20 +16,20 @@ export class UsersController {
     @Post('/login')
     async login(
         @Body() data: LoginDto
-    ): Promise<{user : UserAuth}> {
+    ): Promise<{ user: UserAuth }> {
         const res = await this.authService.login(data.user.email, data.user.password);
         return {
-            user : res
+            user: res
         }
     }
 
     @Post()
     async register(
-        @Body() data: CreateUserDto
-    ): Promise<{user : UserAuth}> {
-        const res = await this.userService.register(data.user);
+        @Body('user') userDto: CreateUserDto
+    ): Promise<{ user: UserAuth }> {
+        const res = await this.userService.register(userDto);
         return {
-            user : res
+            user: res
         }
     }
 
