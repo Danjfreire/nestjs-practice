@@ -2,7 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGua
 import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
-import { ArticleQueryOptions, CreateArticleDto, UpdateArticleDto } from './models/article.dto';
+import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleQueryOptions } from './interfaces/article-query-options.interface';
 
 @Controller('articles')
 export class ArticlesController {
@@ -15,11 +17,11 @@ export class ArticlesController {
     @Post()
     async createArticle(
         @Request() req,
-        @Body() data: CreateArticleDto
+        @Body('article') articleDto: CreateArticleDto
     ) {
         const userId = req.user.id;
 
-        const res = await this.articleService.createArticle(userId, data.article);
+        const res = await this.articleService.createArticle(userId, articleDto);
 
         return {
             article : res
@@ -78,10 +80,10 @@ export class ArticlesController {
     @Put(':slug')
     async updateArticle(
         @Param('slug') slug: string,
-        @Body() data: UpdateArticleDto,
+        @Body('article') articleDto: UpdateArticleDto,
         @Request() req
     ) {
-        const res =  await this.articleService.updateArticle(slug, data.article, req.user.id);
+        const res =  await this.articleService.updateArticle(slug, articleDto, req.user.id);
 
         return {
             article : res

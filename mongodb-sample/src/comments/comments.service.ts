@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ArticlesService } from 'src/articles/articles.service';
-import { ArticleDocument } from 'src/articles/models/article.schema';
+import { ArticleDocument } from 'src/articles/schemas/article.schema';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { Comment, CommentDocument } from './schemas/comment.schema';

@@ -3,8 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
-import { ArticleQueryOptions, ArticleRegisterData, UpdateArticleData } from './models/article.dto';
-import { Article, ArticleDocument } from './models/article.schema';
+import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleQueryOptions } from './interfaces/article-query-options.interface';
+import { Article, ArticleDocument } from './schemas/article.schema';
 
 @Injectable()
 export class ArticlesService {
@@ -14,7 +16,7 @@ export class ArticlesService {
         private userService: UsersService,
     ) { }
 
-    async createArticle(authorId: string, data: ArticleRegisterData): Promise<Article> {
+    async createArticle(authorId: string, data: CreateArticleDto): Promise<Article> {
         const user = await this.userService.findById(authorId);
 
         const now = new Date().toISOString();
@@ -122,7 +124,7 @@ export class ArticlesService {
         return populatedArticle.toArticle((user as UserDocument));
     }
 
-    async updateArticle(slug: string, data: UpdateArticleData, requesterId: string): Promise<Article> {
+    async updateArticle(slug: string, data: UpdateArticleDto, requesterId: string): Promise<Article> {
         const article = await this.articleModel.findOne({ slug })
         const user = await this.userService.findById(requesterId);
 

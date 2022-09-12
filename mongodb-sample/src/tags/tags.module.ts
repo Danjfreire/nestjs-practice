@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { TagsController } from './tags.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Article, ArticleSchema } from 'src/articles/models/article.schema';
+import { Article, ArticleSchema } from 'src/articles/schemas/article.schema';
 
 @Module({
   controllers: [TagsController],

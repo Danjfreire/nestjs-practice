@@ -4,7 +4,7 @@ import { ProfilesModule } from 'src/profiles/profiles.module';
 import { UsersModule } from 'src/users/users.module';
 import { ArticlesController } from './articles.controller';
 import { ArticlesService } from './articles.service';
-import { Article, ArticleSchema } from './models/article.schema';
+import { Article, ArticleSchema } from './schemas/article.schema';
 
 @Module({
   controllers: [ArticlesController],
