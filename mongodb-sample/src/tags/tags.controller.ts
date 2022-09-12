@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { TagsResponse } from './dto/tags.dto';
+import { TagsRO } from './interfaces/tags.dto';
 import { TagsService } from './tags.service';
 
 
@@ -8,7 +8,7 @@ export class TagsController {
   constructor(private readonly tagsService: TagsService) { }
 
   @Get()
-  async findAll(): Promise<TagsResponse> {
+  async findAll(): Promise<TagsRO> {
     const tags = await this.tagsService.findAll();
 
     return {
