@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { RequestUser, User } from 'src/@shared/decorators/user.decorator';
 import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommentsService } from './comments.service';
@@ -17,9 +18,9 @@ export class CommentsController {
     async addComment(
         @Param('slug') slug : string,
         @Body('comment') commentDto : CreateCommentDto,
-        @Request() req 
+        @User() user : RequestUser,
     ) : Promise<CommentRO> {
-        const comment = await this.commentsService.addComment(commentDto, slug, req.user.id);
+        const comment = await this.commentsService.addComment(commentDto, slug, user.id);
 
         return {
             comment
@@ -30,9 +31,9 @@ export class CommentsController {
     @Get('')
     async getComments(
         @Param('slug') slug : string,
-        @Request() req
+        @User() user : RequestUser,
     ) : Promise<MultipleCommentRO> {
-        const comments = await this.commentsService.getComments(slug, req.user.id);
+        const comments = await this.commentsService.getComments(slug, user.id);
 
         return {
             comments
@@ -43,8 +44,8 @@ export class CommentsController {
     @Delete('/:id')
     async deleteComment(
         @Param('id') commentId : string,
-        @Request() req
+        @User() user : RequestUser,
     ) {
-        await this.commentsService.deleteComment(commentId, req.user.id)
+        await this.commentsService.deleteComment(commentId, user.id)
     }
 }

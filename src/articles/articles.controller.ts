@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
+import { RequestUser, User } from 'src/@shared/decorators/user.decorator';
 import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
@@ -17,10 +18,10 @@ export class ArticlesController {
     @UseGuards(JwtAuthGuard)
     @Post()
     async createArticle(
-        @Request() req,
+        @User() user : RequestUser,
         @Body('article') articleDto: CreateArticleDto
     ): Promise<ArticleRO> {
-        const userId = req.user.id;
+        const userId = user.id;
 
         const res = await this.articleService.createArticle(userId, articleDto);
 
@@ -34,23 +35,23 @@ export class ArticlesController {
     async getFeed(
         @Query('limit') limit = 20,
         @Query('offset') offset = 0,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<MultipleArticleRO> {
         const articleQueryOptions: ArticleQueryOptions = {
             limit,
             offset
         }
 
-        return await this.articleService.getArticlesFeed(articleQueryOptions, req.user.id);
+        return await this.articleService.getArticlesFeed(articleQueryOptions, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get(':slug')
     async getArticle(
-        @Request() req,
+        @User() user : RequestUser,
         @Param('slug') slug: string,
     ): Promise<ArticleRO> {
-        const res = await this.articleService.getArticle(slug, req.user.id);
+        const res = await this.articleService.getArticle(slug, user.id);
 
         return {
             article: res
@@ -65,7 +66,7 @@ export class ArticlesController {
         @Query('favorited') favorited: string,
         @Query('limit') limit = 20,
         @Query('offset') offset = 0,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<MultipleArticleRO> {
 
         const articleQueryOptions: ArticleQueryOptions = {
@@ -74,7 +75,7 @@ export class ArticlesController {
             offset
         }
 
-        return await this.articleService.listArticles(articleQueryOptions, req.user.id);
+        return await this.articleService.listArticles(articleQueryOptions, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -82,9 +83,9 @@ export class ArticlesController {
     async updateArticle(
         @Param('slug') slug: string,
         @Body('article') articleDto: UpdateArticleDto,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ArticleRO> {
-        const res = await this.articleService.updateArticle(slug, articleDto, req.user.id);
+        const res = await this.articleService.updateArticle(slug, articleDto, user.id);
 
         return {
             article: res
@@ -95,18 +96,18 @@ export class ArticlesController {
     @Delete(':slug')
     async deleteArticle(
         @Param('slug') slug: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<void> {
-        await this.articleService.deleteArticle(slug, req.user.id);
+        await this.articleService.deleteArticle(slug, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post(':slug/favorite')
     async favoriteArticle(
         @Param('slug') slug: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ArticleRO> {
-        const res = await this.articleService.favoriteArticle(slug, req.user.id);
+        const res = await this.articleService.favoriteArticle(slug, user.id);
 
         return {
             article: res
@@ -117,9 +118,9 @@ export class ArticlesController {
     @Delete(':slug/favorite')
     async unfavoriteArticle(
         @Param('slug') slug: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ArticleRO> {
-        const res = await this.articleService.unfavoriteArticle(slug, req.user.id);
+        const res = await this.articleService.unfavoriteArticle(slug, user.id);
 
         return {
             article: res

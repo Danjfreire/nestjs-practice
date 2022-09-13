@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Put, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { User, RequestUser } from 'src/@shared/decorators/user.decorator';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,9 +17,9 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async find(
-        @Request() req
+        @User() user : RequestUser
     ): Promise<UserRO> {
-        const userDoc = await this.userService.findByEmail(req.user.email);
+        const userDoc = await this.userService.findByEmail(user.email);
         const token = this.authService.generateJwtToken(userDoc);
 
         return {
@@ -30,9 +31,9 @@ export class UserController {
     @Put()
     async update(
         @Body('user') userDto: UpdateUserDto,
-        @Request() req
+        @User() user : RequestUser
     ): Promise<UserRO> {
-        const userDoc = await this.userService.update(req.user.email, userDto);
+        const userDoc = await this.userService.update(user.email, userDto);
         const token = this.authService.generateJwtToken(userDoc);
 
         return {

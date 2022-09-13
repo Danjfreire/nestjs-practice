@@ -1,6 +1,7 @@
 import { Controller, Delete, Get, Param, Post, Request, UseGuards, HttpCode } from '@nestjs/common';
+import { RequestUser, User } from 'src/@shared/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Profile, ProfileRO } from './interfaces/profile.model';
+import { ProfileRO } from './interfaces/profile.model';
 import { ProfilesService } from './profiles.service';
 
 @Controller('profiles')
@@ -14,9 +15,9 @@ export class ProfilesController {
     @Get(':username')
     async findProfile(
         @Param('username') username: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ProfileRO> {
-        const profile = await this.profileService.findProfileByUsername(username, req.user.id);
+        const profile = await this.profileService.findProfileByUsername(username, user.id);
 
         return {
             profile
@@ -28,9 +29,9 @@ export class ProfilesController {
     @Post(':username/follow')
     async followProfile(
         @Param('username') username: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ProfileRO> {
-        const profile = await this.profileService.follow(username, req.user.id);
+        const profile = await this.profileService.follow(username, user.id);
 
         return {
             profile
@@ -41,9 +42,9 @@ export class ProfilesController {
     @Delete(':username/follow')
     async unfollowProfile(
         @Param('username') username: string,
-        @Request() req
+        @User() user : RequestUser,
     ): Promise<ProfileRO> {
-        const profile = await this.profileService.unfollow(username, req.user.id);
+        const profile = await this.profileService.unfollow(username, user.id);
         
         return {
             profile
