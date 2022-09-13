@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Param, Post, Request, UseGuards, HttpCode } from '@nestjs/common';
-import { RequestUser, User } from 'src/@shared/decorators/user.decorator';
+import { RequestUser, User } from 'src/auth/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ProfileRO } from './interfaces/profile.model';
 import { ProfilesService } from './profiles.service';
