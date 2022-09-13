@@ -6,11 +6,9 @@ import { Article, ArticleSchema } from 'src/articles/schemas/article.schema';
 
 @Module({
   controllers: [TagsController],
-  imports : [
-    MongooseModule.forFeature([
-      { name: Article.name, schema: ArticleSchema },
-    ])
+  imports: [
+    MongooseModule.forFeature([{ name: Article.name, schema: ArticleSchema }]),
   ],
-  providers: [TagsService]
+  providers: [TagsService],
 })
 export class TagsModule {}

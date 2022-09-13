@@ -12,7 +12,7 @@ import { Comment, CommentSchema } from './schemas/comment.schema';
   imports: [
     ArticlesModule,
     UsersModule,
-    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }])
-  ]
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+  ],
 })
-export class CommentsModule { }
+export class CommentsModule {}

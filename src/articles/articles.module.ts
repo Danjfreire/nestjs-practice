@@ -12,10 +12,8 @@ import { Article, ArticleSchema } from './schemas/article.schema';
   imports: [
     UsersModule,
     ProfilesModule,
-    MongooseModule.forFeature([
-      { name: Article.name, schema: ArticleSchema },
-    ])
+    MongooseModule.forFeature([{ name: Article.name, schema: ArticleSchema }]),
   ],
-  exports: [ArticlesService]
+  exports: [ArticlesService],
 })
-export class ArticlesModule { }
+export class ArticlesModule {}

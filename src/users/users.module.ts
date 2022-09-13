@@ -11,8 +11,8 @@ import { UserController } from './user.controller';
   providers: [UsersService],
   imports: [
     forwardRef(() => AuthModule),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  exports: [UsersService]
+  exports: [UsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

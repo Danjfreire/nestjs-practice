@@ -1,3 +1,3 @@
 export interface TagsRO {
-    tags: string[];
+  tags: string[];
 }

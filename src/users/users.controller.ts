@@ -7,30 +7,27 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+  constructor(
+    private userService: UsersService,
+    private authService: AuthService,
+  ) {}
 
-    constructor(
-        private userService: UsersService,
-        private authService: AuthService
-    ) { }
+  @Post('/login')
+  async login(@Body() data: LoginDto): Promise<UserRO> {
+    const user = await this.authService.login(
+      data.user.email,
+      data.user.password,
+    );
+    return {
+      user: user,
+    };
+  }
 
-    @Post('/login')
-    async login(
-        @Body() data: LoginDto
-    ): Promise<UserRO> {
-        const user = await this.authService.login(data.user.email, data.user.password);
-        return {
-            user : user
-        }
-    }
-
-    @Post()
-    async register(
-        @Body('user') userDto: CreateUserDto
-    ): Promise<UserRO> {
-        const user = await this.userService.register(userDto);
-        return {
-            user: user
-        }
-    }
-
+  @Post()
+  async register(@Body('user') userDto: CreateUserDto): Promise<UserRO> {
+    const user = await this.userService.register(userDto);
+    return {
+      user: user,
+    };
+  }
 }

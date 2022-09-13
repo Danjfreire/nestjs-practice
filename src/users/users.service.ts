@@ -1,4 +1,10 @@
-import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User, UserDocument } from './schemas/user.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,81 +15,90 @@ import { UserAuth } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
+  ) {}
 
-    constructor(
-        @InjectModel(User.name) private userModel: Model<UserDocument>,
-        @Inject(forwardRef(() => AuthService))
-        private authService: AuthService
-    ) {
+  async register(data: CreateUserDto): Promise<UserAuth> {
+    try {
+      const hashedPassword = await this.authService.hashPassword(data.password);
+      await new this.userModel({
+        email: data.email,
+        username: data.username,
+        password: hashedPassword,
+      }).save();
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Email or username registered');
+      }
     }
 
-    async register(data: CreateUserDto): Promise<UserAuth> {
+    return await this.authService.login(data.email, data.password);
+  }
 
-        try {
-            const hashedPassword = await this.authService.hashPassword(data.password);
-            await new this.userModel({
-                email: data.email,
-                username: data.username,
-                password: hashedPassword
-            }).save();
-        } catch (error) {
-            if (error.code === 11000) {
-                throw new BadRequestException('Email or username registered');
-            }
-        }
+  async findById(id: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ _id: id });
 
-        return await this.authService.login(data.email, data.password);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    async findById(id: string): Promise<UserDocument> {
-        const user = await this.userModel.findOne({ _id: id });
+    return user;
+  }
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+  async findByUsername(username: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ username });
 
-        return user;
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    async findByUsername(username: string): Promise<UserDocument> {
+    return user;
+  }
 
-        const user = await this.userModel.findOne({ username });
+  async findByEmail(email: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ email });
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        return user;
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    async findByEmail(email: string): Promise<UserDocument> {
+    return user;
+  }
 
-        const user = await this.userModel.findOne({ email });
-
-        if (!user) {
-            throw new NotFoundException('User not found')
-        }
-
-        return user;
+  async update(email: string, data: UpdateUserDto): Promise<UserDocument> {
+    if (data.password) {
+      data.password = await this.authService.hashPassword(data.password);
     }
 
-    async update(email: string, data: UpdateUserDto): Promise<UserDocument> {
+    const user = await this.userModel.findOneAndUpdate({ email }, data, {
+      new: true,
+    });
 
-        if (data.password) {
-            data.password = await this.authService.hashPassword(data.password);
-        }
+    return user;
+  }
 
-        const user = await this.userModel.findOneAndUpdate({ email }, data, { new: true })
+  async addFavoriteArticle(
+    userId: string,
+    articleId: string,
+  ): Promise<UserDocument> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      { $addToSet: { favorites: articleId } },
+      { new: true },
+    );
+  }
 
-        return user;
-    }
-
-    async addFavoriteArticle(userId: string, articleId: string): Promise<UserDocument> {
-        return await this.userModel.findOneAndUpdate({ _id: userId }, { $addToSet: { favorites: articleId } }, { new: true })
-    }
-
-    async removeFavoriteArticle(userId: string, articleId: string): Promise<UserDocument> {
-        return await this.userModel.findOneAndUpdate({ _id: userId }, { $pull: { favorites: articleId } }, { new: true });
-    }
-
+  async removeFavoriteArticle(
+    userId: string,
+    articleId: string,
+  ): Promise<UserDocument> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { favorites: articleId } },
+      { new: true },
+    );
+  }
 }

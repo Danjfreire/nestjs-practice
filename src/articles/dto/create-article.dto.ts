@@ -1,18 +1,15 @@
-import { Type } from "class-transformer";
-import { IsString, IsOptional, IsDefined, IsNotEmptyObject, IsObject, ValidateNested } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class CreateArticleDto {
-    @IsString()
-    title: string;
+  @IsString()
+  title: string;
 
-    @IsString()
-    description: string;
+  @IsString()
+  description: string;
 
-    @IsString()
-    body: string;
+  @IsString()
+  body: string;
 
-    @IsString({ each: true })
-    tagList: string[];
+  @IsString({ each: true })
+  tagList: string[];
 }
-
-

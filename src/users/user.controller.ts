@@ -8,37 +8,33 @@ import { UsersService } from './users.service';
 
 @Controller('user')
 export class UserController {
+  constructor(
+    private userService: UsersService,
+    private authService: AuthService,
+  ) {}
 
-    constructor(
-        private userService: UsersService,
-        private authService : AuthService,
-    ){}
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async find(@User() user: RequestUser): Promise<UserRO> {
+    const userDoc = await this.userService.findByEmail(user.email);
+    const token = this.authService.generateJwtToken(userDoc);
 
-    @UseGuards(JwtAuthGuard)
-    @Get()
-    async find(
-        @User() user : RequestUser
-    ): Promise<UserRO> {
-        const userDoc = await this.userService.findByEmail(user.email);
-        const token = this.authService.generateJwtToken(userDoc);
+    return {
+      user: userDoc.toUserAuth(token),
+    };
+  }
 
-        return {
-            user : userDoc.toUserAuth(token),
-        }
-    }
+  @UseGuards(JwtAuthGuard)
+  @Put()
+  async update(
+    @Body('user') userDto: UpdateUserDto,
+    @User() user: RequestUser,
+  ): Promise<UserRO> {
+    const userDoc = await this.userService.update(user.email, userDto);
+    const token = this.authService.generateJwtToken(userDoc);
 
-    @UseGuards(JwtAuthGuard)
-    @Put()
-    async update(
-        @Body('user') userDto: UpdateUserDto,
-        @User() user : RequestUser
-    ): Promise<UserRO> {
-        const userDoc = await this.userService.update(user.email, userDto);
-        const token = this.authService.generateJwtToken(userDoc);
-
-        return {
-            user : userDoc.toUserAuth(token),
-        };
-    }
-
+    return {
+      user: userDoc.toUserAuth(token),
+    };
+  }
 }

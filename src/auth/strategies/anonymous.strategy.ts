@@ -1,12 +1,12 @@
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy } from "passport-anonymous"
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-anonymous';
 
 export class AnonymousStrategy extends PassportStrategy(Strategy, 'anonymous') {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super();
+  }
 
-    authenticate(): void {
-        return this.success({});
-    }
+  authenticate(): void {
+    return this.success({});
+  }
 }

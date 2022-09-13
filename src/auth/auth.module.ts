@@ -12,11 +12,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   imports: [
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1d' }
+      signOptions: { expiresIn: '1d' },
     }),
     forwardRef(() => UsersModule),
-    PassportModule
+    PassportModule,
   ],
-  exports: [AuthService]
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

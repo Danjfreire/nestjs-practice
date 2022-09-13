@@ -10,8 +10,8 @@ import { ProfilesService } from './profiles.service';
   providers: [ProfilesService],
   imports: [
     UsersModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  exports : [ProfilesService]
+  exports: [ProfilesService],
 })
-export class ProfilesModule { }
+export class ProfilesModule {}
