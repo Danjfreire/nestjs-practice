@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleQueryOptions } from './interfaces/article-query-options.interface';
+import { ArticleJSON, MultipleArticleRO } from './interfaces/article.interface';
 import { Article, ArticleDocument } from './schemas/article.schema';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class ArticlesService {
         private userService: UsersService,
     ) { }
 
-    async createArticle(authorId: string, data: CreateArticleDto): Promise<Article> {
+    async createArticle(authorId: string, data: CreateArticleDto): Promise<ArticleJSON> {
         const user = await this.userService.findById(authorId);
 
         const now = new Date().toISOString();
@@ -33,10 +34,10 @@ export class ArticlesService {
 
         const article = await new this.articleModel(articleData).save()
 
-        return (await article.populate('author')).toArticle(user);
+        return (await article.populate('author')).toJSON(user);
     }
 
-    async listArticles(queryOptions: ArticleQueryOptions, requesterId?: string): Promise<{ articlesCount: number, articles: Article[] }> {
+    async listArticles(queryOptions: ArticleQueryOptions, requesterId?: string): Promise<MultipleArticleRO> {
 
         let query: any = {};
 
@@ -72,7 +73,7 @@ export class ArticlesService {
             const res = {
                 articlesCount,
                 articles: articles.map(article => {
-                    return article.toArticle(requester)
+                    return article.toJSON(requester)
                 })
             }
 
@@ -87,7 +88,7 @@ export class ArticlesService {
         }
     }
 
-    async getArticlesFeed(queryOptions: ArticleQueryOptions, requesterId: string): Promise<{ articlesCount: number, articles: Article[] }> {
+    async getArticlesFeed(queryOptions: ArticleQueryOptions, requesterId: string): Promise<MultipleArticleRO> {
         // get articles created by followed users
         const user = await this.userService.findById(requesterId);
 
@@ -105,7 +106,7 @@ export class ArticlesService {
         const res = {
             articlesCount,
             articles: articles.map(article => {
-                return article.toArticle(user)
+                return article.toJSON(user)
             })
         }
 
@@ -116,15 +117,15 @@ export class ArticlesService {
         return await this.articleModel.findOne({ slug })
     }
 
-    async getArticle(slug: string, requesterId?: string): Promise<Article> {
+    async getArticle(slug: string, requesterId?: string): Promise<ArticleJSON> {
         const user = requesterId ? await this.userService.findById(requesterId) : null;
         const article = await this.findArticle(slug)
         const populatedArticle = await article.populate('author');
 
-        return populatedArticle.toArticle((user as UserDocument));
+        return populatedArticle.toJSON((user as UserDocument));
     }
 
-    async updateArticle(slug: string, data: UpdateArticleDto, requesterId: string): Promise<Article> {
+    async updateArticle(slug: string, data: UpdateArticleDto, requesterId: string): Promise<ArticleJSON> {
         const article = await this.articleModel.findOne({ slug })
         const user = await this.userService.findById(requesterId);
 
@@ -143,7 +144,7 @@ export class ArticlesService {
 
         const updatedArticle = await (await article.save()).populate('author');
 
-        return updatedArticle.toArticle(user)
+        return updatedArticle.toJSON(user)
     }
 
     async deleteArticle(slug: string, requesterId: string) {
@@ -158,7 +159,7 @@ export class ArticlesService {
         return await article.delete();
     }
 
-    async favoriteArticle(slug: string, requesterId: string): Promise<Article> {
+    async favoriteArticle(slug: string, requesterId: string): Promise<ArticleJSON> {
         const [user, article] = await Promise.all([
             this.userService.findById(requesterId),
             this.articleModel.findOne({ slug }).populate('author')
@@ -179,10 +180,10 @@ export class ArticlesService {
             (await article.save()).populate('author')
         ]);
 
-        return updatedArticle.toArticle(updatedUser)
+        return updatedArticle.toJSON(updatedUser)
     }
 
-    async unfavoriteArticle(slug: string, requesterId: string) {
+    async unfavoriteArticle(slug: string, requesterId: string): Promise<ArticleJSON> {
         const [user, article] = await Promise.all([
             this.userService.findById(requesterId),
             this.articleModel.findOne({ slug }).populate('author')
@@ -203,10 +204,10 @@ export class ArticlesService {
             (await article.save()).populate('author')
         ]);
 
-        return updatedArticle.toArticle(updatedUser);
+        return updatedArticle.toJSON(updatedUser);
     }
 
-    private getTitleSlug(title: string) {
+    private getTitleSlug(title: string): string {
         return title.toLocaleLowerCase().replace(/ /g, '-');
     }
 

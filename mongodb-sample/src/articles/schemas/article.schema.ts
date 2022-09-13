@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsOptional, IsString } from "class-validator";
 import mongoose, { Document } from "mongoose";
 import { User, UserDocument } from "src/users/schemas/user.schema";
+import { ArticleJSON } from "../interfaces/article.interface";
 
 export type ArticleDocument = Article & Document;
 
@@ -38,12 +39,12 @@ export class Article {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     author: User;
 
-    toArticle: Function
+    toJSON: (requesterUser : UserDocument) => ArticleJSON
 }
 
 export const ArticleSchema = SchemaFactory.createForClass(Article);
 
-ArticleSchema.methods.toArticle = function (requesterUser: UserDocument) {
+ArticleSchema.methods.toJSON = function (requesterUser: UserDocument) {
     return {
         author: this.author.toProfile(requesterUser),
         body: this.body,

@@ -5,6 +5,7 @@ import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleQueryOptions } from './interfaces/article-query-options.interface';
+import { ArticleRO, MultipleArticleRO } from './interfaces/article.interface';
 
 @Controller('articles')
 export class ArticlesController {
@@ -18,13 +19,13 @@ export class ArticlesController {
     async createArticle(
         @Request() req,
         @Body('article') articleDto: CreateArticleDto
-    ) {
+    ): Promise<ArticleRO> {
         const userId = req.user.id;
 
         const res = await this.articleService.createArticle(userId, articleDto);
 
         return {
-            article : res
+            article: res
         }
     }
 
@@ -34,7 +35,7 @@ export class ArticlesController {
         @Query('limit') limit = 20,
         @Query('offset') offset = 0,
         @Request() req
-    ) {
+    ): Promise<MultipleArticleRO> {
         const articleQueryOptions: ArticleQueryOptions = {
             limit,
             offset
@@ -48,7 +49,7 @@ export class ArticlesController {
     async getArticle(
         @Request() req,
         @Param('slug') slug: string,
-    ) {
+    ): Promise<ArticleRO> {
         const res = await this.articleService.getArticle(slug, req.user.id);
 
         return {
@@ -65,7 +66,7 @@ export class ArticlesController {
         @Query('limit') limit = 20,
         @Query('offset') offset = 0,
         @Request() req
-    ) {
+    ): Promise<MultipleArticleRO> {
 
         const articleQueryOptions: ArticleQueryOptions = {
             query: { tag, author, favorited },
@@ -82,11 +83,11 @@ export class ArticlesController {
         @Param('slug') slug: string,
         @Body('article') articleDto: UpdateArticleDto,
         @Request() req
-    ) {
-        const res =  await this.articleService.updateArticle(slug, articleDto, req.user.id);
+    ): Promise<ArticleRO> {
+        const res = await this.articleService.updateArticle(slug, articleDto, req.user.id);
 
         return {
-            article : res
+            article: res
         }
     }
 
@@ -95,7 +96,7 @@ export class ArticlesController {
     async deleteArticle(
         @Param('slug') slug: string,
         @Request() req
-    ) {
+    ): Promise<void> {
         await this.articleService.deleteArticle(slug, req.user.id);
     }
 
@@ -104,11 +105,11 @@ export class ArticlesController {
     async favoriteArticle(
         @Param('slug') slug: string,
         @Request() req
-    ) {
+    ): Promise<ArticleRO> {
         const res = await this.articleService.favoriteArticle(slug, req.user.id);
 
         return {
-            article : res
+            article: res
         }
     }
 
@@ -117,11 +118,11 @@ export class ArticlesController {
     async unfavoriteArticle(
         @Param('slug') slug: string,
         @Request() req
-    ) {
+    ): Promise<ArticleRO> {
         const res = await this.articleService.unfavoriteArticle(slug, req.user.id);
 
         return {
-            article : res
+            article: res
         }
     }
 

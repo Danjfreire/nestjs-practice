@@ -19,7 +19,6 @@ export class CommentsController {
         @Body('comment') commentDto : CreateCommentDto,
         @Request() req 
     ) : Promise<CommentRO> {
-        //check if
         const comment = await this.commentsService.addComment(commentDto, slug, req.user.id);
 
         return {
