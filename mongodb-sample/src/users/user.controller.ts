@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Put, UseGuards, Request } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { UserAuth } from 'src/auth/interfaces/user-auth.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRO } from './interfaces/user.interface';
 import { UsersService } from './users.service';
@@ -9,7 +9,8 @@ import { UsersService } from './users.service';
 export class UserController {
 
     constructor(
-        private userService: UsersService
+        private userService: UsersService,
+        private authService : AuthService,
     ){}
 
     @UseGuards(JwtAuthGuard)
@@ -17,19 +18,11 @@ export class UserController {
     async find(
         @Request() req
     ): Promise<UserRO> {
-        const userData = await this.userService.findByEmail(req.user.email);
-        const token = req.headers.authorization.split(' ')[1];
-
-        const user: UserAuth = {
-            bio: userData?.bio ?? '',
-            email: userData.email,
-            image: userData?.image ?? '',
-            username: userData.username,
-            token,
-        }
+        const userDoc = await this.userService.findByEmail(req.user.email);
+        const token = this.authService.generateJwtToken(userDoc);
 
         return {
-            user : user
+            user : userDoc.toUserAuthJSON(token),
         }
     }
 
@@ -39,18 +32,11 @@ export class UserController {
         @Body('user') userDto: UpdateUserDto,
         @Request() req
     ): Promise<UserRO> {
-        const userData = await this.userService.update(req.user.email, userDto);
-
-        const user: UserAuth = {
-            bio: userData?.bio ?? '',
-            email: userData.email,
-            image: userData?.image ?? '',
-            username: userData.username,
-            token: req.headers.authorization.split(' ')[1],
-        }
+        const userDoc = await this.userService.update(req.user.email, userDto);
+        const token = this.authService.generateJwtToken(userDoc);
 
         return {
-            user : user
+            user : userDoc.toUserAuthJSON(token),
         };
     }
 

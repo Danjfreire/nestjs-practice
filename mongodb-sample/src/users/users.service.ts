@@ -4,8 +4,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserAuth } from 'src/auth/interfaces/user-auth.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserAuthJSON } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +17,7 @@ export class UsersService {
     ) {
     }
 
-    async register(data: CreateUserDto): Promise<UserAuth> {
+    async register(data: CreateUserDto): Promise<UserAuthJSON> {
 
         try {
             const hashedPassword = await this.authService.hashPassword(data.password);
@@ -78,11 +78,11 @@ export class UsersService {
         return user;
     }
 
-    async addFavoriteArticle(userId: string, articleId: string): Promise<User> {
+    async addFavoriteArticle(userId: string, articleId: string): Promise<UserDocument> {
         return await this.userModel.findOneAndUpdate({ _id: userId }, { $addToSet: { favorites: articleId } }, { new: true })
     }
 
-    async removeFavoriteArticle(userId: string, articleId: string): Promise<User> {
+    async removeFavoriteArticle(userId: string, articleId: string): Promise<UserDocument> {
         return await this.userModel.findOneAndUpdate({ _id: userId }, { $pull: { favorites: articleId } }, { new: true });
     }
 

@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { UserDocument } from 'src/users/schemas/user.schema';
 import * as argon2 from "argon2";
 import { UsersService } from 'src/users/users.service';
-import { UserAuth } from './interfaces/user-auth.interface';
+import { UserAuthJSON } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
     ) { }
 
 
-    async validateUser(email: string, password: string): Promise<User> {
+    async validateUser(email: string, password: string): Promise<UserDocument> {
         const user = await this.userService.findByEmail(email);
         //check if password matches
         if (!await argon2.verify(user.password, password)) {
@@ -24,18 +24,17 @@ export class AuthService {
         return user;
     }
 
-    async login(email : string, password : string): Promise<UserAuth> {
-        const user = await this.validateUser(email, password);
+    async login(email: string, password: string): Promise<UserAuthJSON> {
+        const userDoc = await this.validateUser(email, password);
+        const token = this.generateJwtToken(userDoc);
+
+        return userDoc.toUserAuthJSON(token)
+    }
+
+    generateJwtToken(user: UserDocument): string {
         const payload = { email: user.email, username: user.username, sub: (user as UserDocument)._id }
         const token = this.jwtService.sign(payload);
-
-        return {
-            email: user.email,
-            username: user.username,
-            bio: user.bio || '',
-            image: user.image || '',
-            token,
-        }
+        return token;
     }
 
     async hashPassword(password: string) {
