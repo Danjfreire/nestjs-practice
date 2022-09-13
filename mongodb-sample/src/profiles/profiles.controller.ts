@@ -16,7 +16,11 @@ export class ProfilesController {
         @Param('username') username: string,
         @Request() req
     ): Promise<ProfileRO> {
-        return await this.profileService.findProfileByUsername(username, req.user.id);
+        const profile = await this.profileService.findProfileByUsername(username, req.user.id);
+
+        return {
+            profile
+        }
     }
 
     @HttpCode(200)
@@ -26,7 +30,11 @@ export class ProfilesController {
         @Param('username') username: string,
         @Request() req
     ): Promise<ProfileRO> {
-        return await this.profileService.follow(username, req.user.id);
+        const profile = await this.profileService.follow(username, req.user.id);
+
+        return {
+            profile
+        }
     }
 
     @UseGuards(JwtAuthGuard)
@@ -35,7 +43,11 @@ export class ProfilesController {
         @Param('username') username: string,
         @Request() req
     ): Promise<ProfileRO> {
-        return await this.profileService.unfollow(username, req.user.id);
+        const profile = await this.profileService.unfollow(username, req.user.id);
+        
+        return {
+            profile
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 
-export interface UserAuthJSON {
+export interface UserAuth {
     email: string;
     token: string;
     username: string;
@@ -8,5 +8,5 @@ export interface UserAuthJSON {
 }
 
 export interface UserRO {
-    user : UserAuthJSON
+    user : UserAuth
 }

@@ -22,7 +22,7 @@ export class UserController {
         const token = this.authService.generateJwtToken(userDoc);
 
         return {
-            user : userDoc.toUserAuthJSON(token),
+            user : userDoc.toUserAuth(token),
         }
     }
 
@@ -36,7 +36,7 @@ export class UserController {
         const token = this.authService.generateJwtToken(userDoc);
 
         return {
-            user : userDoc.toUserAuthJSON(token),
+            user : userDoc.toUserAuth(token),
         };
     }
 

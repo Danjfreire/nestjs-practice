@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserAuthJSON } from './interfaces/user.interface';
+import { UserAuth } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +17,7 @@ export class UsersService {
     ) {
     }
 
-    async register(data: CreateUserDto): Promise<UserAuthJSON> {
+    async register(data: CreateUserDto): Promise<UserAuth> {
 
         try {
             const hashedPassword = await this.authService.hashPassword(data.password);

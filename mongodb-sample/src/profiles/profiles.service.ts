@@ -15,42 +15,36 @@ export class ProfilesService {
         private userService: UsersService
     ) { }
 
-    async findProfileByUsername(username: string, requesterId: string) : Promise<{profile : Profile}> {
-        const currentUser = await this.userService.findById(requesterId);
-        const user = await this.userService.findByUsername(username);
+    async findProfileByUsername(username: string, requesterId: string) : Promise<Profile> {
+        const currentUserDoc = await this.userService.findById(requesterId);
+        const userDoc = await this.userService.findByUsername(username);
 
-        return {
-            profile : user.toProfile((currentUser as UserDocument))
-        };
+        return userDoc.toProfile(currentUserDoc);
     }
 
-    async follow(username: string, currentUserId: string): Promise<{profile : Profile}> {
+    async follow(username: string, currentUserId: string): Promise<Profile> {
         // check if user exists
         const user = await this.userService.findByUsername(username);
 
         const updatedUser = await this.userModel.findOneAndUpdate(
             { _id: currentUserId },
-            { $addToSet: { following: (user as UserDocument)._id } },
+            { $addToSet: { following: user._id } },
             { new: true }
         );
 
-        return {
-            profile: user.toProfile((updatedUser as UserDocument))
-        };
+        return user.toProfile(updatedUser);
     }
 
-    async unfollow(username: string, currentUserId: string): Promise<{profile : Profile}> {
+    async unfollow(username: string, currentUserId: string): Promise<Profile> {
         const user = await this.userService.findByUsername(username);
 
         const updatedUser = await this.userModel.findOneAndUpdate(
             { _id: currentUserId },
-            { $pull: { following: (user as UserDocument)._id } },
+            { $pull: { following: user._id } },
             { new: true }
         );
 
-        return {
-            profile : user.toProfile((updatedUser as UserDocument))
-        };
+        return user.toProfile(updatedUser);
     }
 
 }

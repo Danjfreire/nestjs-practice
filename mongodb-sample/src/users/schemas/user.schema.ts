@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
 import { Profile } from "src/profiles/interfaces/profile.model";
-import { UserAuthJSON } from "../interfaces/user.interface";
+import { UserAuth } from "../interfaces/user.interface";
 
 
 export type UserDocument = User & Document;
@@ -32,7 +32,7 @@ export class User {
 
     toProfile: (referenceUser: UserDocument) => Profile;
 
-    toUserAuthJSON: (token: string) => UserAuthJSON;
+    toUserAuth: (token: string) => UserAuth;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -46,7 +46,7 @@ UserSchema.methods.toProfile = function (referenceUser: UserDocument): Profile {
     }
 }
 
-UserSchema.methods.toUserAuthJSON = function (token: string): UserAuthJSON {
+UserSchema.methods.toUserAuth = function (token: string): UserAuth {
     return {
         bio: this.bio ?? '',
         email: this.email,
