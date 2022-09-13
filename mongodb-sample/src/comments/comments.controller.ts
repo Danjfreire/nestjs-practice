@@ -3,6 +3,7 @@ import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CommentRO, MultipleCommentRO } from './interfaces/comment.interface';
 
 @Controller('articles/:slug/comments')
 export class CommentsController {
@@ -15,9 +16,9 @@ export class CommentsController {
     @Post('')
     async addComment(
         @Param('slug') slug : string,
-        @Body('body') commentDto : CreateCommentDto,
+        @Body('comment') commentDto : CreateCommentDto,
         @Request() req 
-    ) {
+    ) : Promise<CommentRO> {
         //check if
         const comment = await this.commentsService.addComment(commentDto, slug, req.user.id);
 
@@ -31,7 +32,7 @@ export class CommentsController {
     async getComments(
         @Param('slug') slug : string,
         @Request() req
-    ) {
+    ) : Promise<MultipleCommentRO> {
         const comments = await this.commentsService.getComments(slug, req.user.id);
 
         return {

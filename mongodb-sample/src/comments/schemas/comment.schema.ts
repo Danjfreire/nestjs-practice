@@ -2,9 +2,9 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
 import { Article } from "src/articles/schemas/article.schema";
 import { User, UserDocument } from "src/users/schemas/user.schema";
+import { CommentJSON } from "../interfaces/comment.interface";
 
 export type CommentDocument = Comment & Document;
-
 @Schema()
 export class Comment {
 
@@ -23,17 +23,17 @@ export class Comment {
     @Prop({ required: true })
     updatedAt: string;
 
-    toJson : Function
+    toJSON : (referenceUser : UserDocument) => CommentJSON;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment)
 
-CommentSchema.methods.toJson = function(referenceUser : UserDocument) {
+CommentSchema.methods.toJSON = function(referenceUser : UserDocument) {
     return {
         id : this._id,
         createdAt : this.createdAt,
         updatedAt : this.updatedAt,
         body : this.body,
-        author : this.author.toProfile(referenceUser)
+        author : (this.author as UserDocument).toProfile(referenceUser)
     }
 }

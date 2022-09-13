@@ -35,7 +35,7 @@ export class UsersService {
         return await this.authService.login(data.email, data.password);
     }
 
-    async findById(id: string): Promise<User> {
+    async findById(id: string): Promise<UserDocument> {
         const user = await this.userModel.findOne({ _id: id });
 
         if (!user) {
@@ -45,7 +45,7 @@ export class UsersService {
         return user;
     }
 
-    async findByUsername(username: string): Promise<User> {
+    async findByUsername(username: string): Promise<UserDocument> {
 
         const user = await this.userModel.findOne({ username });
 
@@ -56,7 +56,7 @@ export class UsersService {
         return user;
     }
 
-    async findByEmail(email: string): Promise<User> {
+    async findByEmail(email: string): Promise<UserDocument> {
 
         const user = await this.userModel.findOne({ email });
 
@@ -67,7 +67,7 @@ export class UsersService {
         return user;
     }
 
-    async update(email: string, data: UpdateUserDto): Promise<User> {
+    async update(email: string, data: UpdateUserDto): Promise<UserDocument> {
 
         if (data.password) {
             data.password = await this.authService.hashPassword(data.password);

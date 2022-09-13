@@ -7,6 +7,7 @@ import { UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CommentJSON } from './interfaces/comment.interface';
 
 @Injectable()
 export class CommentsService {
@@ -17,7 +18,7 @@ export class CommentsService {
         private userService: UsersService,
     ) { }
 
-    async addComment(data: CreateCommentDto, articleSlug: string, authorId: string): Promise<Comment> {
+    async addComment(data: CreateCommentDto, articleSlug: string, authorId: string): Promise<CommentJSON> {
         const [user, article] = await Promise.all([
             await this.userService.findById(authorId),
             await this.articleService.findArticle(articleSlug)
@@ -40,10 +41,10 @@ export class CommentsService {
             .save();
 
         const populatedComment = await comment.populate('author')
-        return populatedComment.toJson(user)
+        return populatedComment.toJSON(user)
     }
 
-    async getComments(articleSlug: string, requesterId?: string): Promise<Comment[]> {
+    async getComments(articleSlug: string, requesterId?: string): Promise<CommentJSON[]> {
         const [user, article] = await Promise.all([
             requesterId ? await this.userService.findById(requesterId) : null,
             await this.articleService.findArticle(articleSlug)
@@ -51,10 +52,10 @@ export class CommentsService {
 
         const comments = await this.commentModel.find({ article: (article as ArticleDocument)._id }).populate('author');
 
-        return comments.map(comment => comment.toJson(user));
+        return comments.map(comment => comment.toJSON(user));
     }
 
-    async deleteComment(commentId: string, requesterId) {
+    async deleteComment(commentId: string, requesterId) : Promise<void> {
         try {
             const comment = await this.commentModel.findOne({ _id: commentId });
             if (!comment) {
