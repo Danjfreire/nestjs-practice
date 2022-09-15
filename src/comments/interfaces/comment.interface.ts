@@ -1,4 +1,4 @@
-import { Profile } from 'src/profiles/interfaces/profile.model';
+import { Profile } from '../../profiles/interfaces/profile.model';
 
 export interface CommentJSON {
   id: string;

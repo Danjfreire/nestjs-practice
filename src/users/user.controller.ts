@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { User, RequestUser } from 'src/auth/decorators/user.decorator';
-import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User, RequestUser } from '../auth/decorators/user.decorator';
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRO } from './interfaces/user.interface';
 import { UsersService } from './users.service';
+
 
 @Controller('user')
 export class UserController {

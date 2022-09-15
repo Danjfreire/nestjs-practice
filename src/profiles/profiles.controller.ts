@@ -7,10 +7,11 @@ import {
   UseGuards,
   HttpCode,
 } from '@nestjs/common';
-import { RequestUser, User } from 'src/auth/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RequestUser, User } from '../auth/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProfileRO } from './interfaces/profile.model';
 import { ProfilesService } from './profiles.service';
+
 
 @Controller('profiles')
 export class ProfilesController {

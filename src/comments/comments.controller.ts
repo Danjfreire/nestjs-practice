@@ -7,9 +7,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { RequestUser, User } from 'src/auth/decorators/user.decorator';
-import { AnonymousAuthGuard } from 'src/auth/guards/anonymous-auth.guard';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RequestUser, User } from '../auth/decorators/user.decorator';
+import { AnonymousAuthGuard } from '../auth/guards/anonymous-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentRO, MultipleCommentRO } from './interfaces/comment.interface';
