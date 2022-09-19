@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ArticlesService } from 'src/articles/articles.service';
-import { ArticleDocument } from 'src/articles/schemas/article.schema';
-import { UserDocument } from 'src/users/schemas/user.schema';
-import { UsersService } from 'src/users/users.service';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentJSON } from './interfaces/comment.interface';
+import { ArticlesService } from '../articles/articles.service';
+import { UsersService } from '../users/users.service';
+import { ArticleDocument } from '../articles/schemas/article.schema';
+import { UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class CommentsService {
