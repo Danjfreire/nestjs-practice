@@ -21,20 +21,26 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
-  ) {}
+  ) { }
 
   async register(data: CreateUserDto): Promise<UserAuth> {
     try {
       const hashedPassword = await this.authService.hashPassword(data.password);
-      await new this.userModel({
+      await this.userModel.create({
         email: data.email,
         username: data.username,
         password: hashedPassword,
-      }).save();
+      })
+      // replaced with create, check if it works
+      // await new this.userModel({
+      //   email: data.email,
+      //   username: data.username,
+      //   password: hashedPassword,
+      // }).save();
     } catch (error) {
-      if (error.code === 11000) {
-        throw new BadRequestException('Email or username registered');
-      }
+      // if (error.code === 11000) {
+      throw new BadRequestException('Email or username already registered');
+      // }
     }
 
     return await this.authService.login(data.email, data.password);
