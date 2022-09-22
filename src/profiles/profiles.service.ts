@@ -11,14 +11,18 @@ export class ProfilesService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private userService: UsersService,
-  ) {}
+  ) { }
 
   async findProfileByUsername(
     username: string,
     requesterId: string,
   ): Promise<Profile> {
-    const currentUserDoc = await this.userService.findById(requesterId);
-    const userDoc = await this.userService.findByUsername(username);
+    const [currentUserDoc, userDoc] = await Promise.all(
+      [
+        this.userService.findById(requesterId),
+        this.userService.findByUsername(username)
+      ]
+    );
 
     return userDoc.toProfile(currentUserDoc);
   }
