@@ -19,7 +19,7 @@ export class CommentsService {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     private articleService: ArticlesService,
     private userService: UsersService,
-  ) {}
+  ) { }
 
   async addComment(
     data: CreateCommentDto,
@@ -37,13 +37,21 @@ export class CommentsService {
 
     const now = new Date();
 
-    const comment = await new this.commentModel({
+    const comment = await this.commentModel.create({
       body: data.body,
       article: (article as ArticleDocument)._id,
       author: (user as UserDocument)._id,
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
-    }).save();
+    });
+
+    // const comment = await new this.commentModel({
+    //   body: data.body,
+    //   article: (article as ArticleDocument)._id,
+    //   author: (user as UserDocument)._id,
+    //   createdAt: now.toISOString(),
+    //   updatedAt: now.toISOString(),
+    // }).save();
 
     const populatedComment = await comment.populate('author');
     return populatedComment.toJSON(user);
@@ -66,7 +74,6 @@ export class CommentsService {
   }
 
   async deleteComment(commentId: string, requesterId): Promise<void> {
-    try {
       const comment = await this.commentModel.findOne({ _id: commentId });
       if (!comment) {
         throw new NotFoundException('Comment not found');
@@ -77,8 +84,5 @@ export class CommentsService {
       }
 
       await this.commentModel.deleteOne({ _id: commentId });
-    } catch (error) {
-      throw new NotFoundException('Comment not found');
-    }
   }
 }
