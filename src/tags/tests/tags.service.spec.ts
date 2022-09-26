@@ -27,9 +27,9 @@ describe('TagsService', () => {
   it('should find all tags', async () => {
     const tags = ['tag1', 'tag2', 'tag3'];
 
-    const findQuery = { distinct : jest.fn(() => ({exec : async () => tags}))}
+    const findQuery = { distinct: jest.fn(() => ({ exec: async () => tags })) }
 
-    jest.spyOn(articleModel, 'find').mockImplementation(() => findQuery );
+    jest.spyOn(articleModel, 'find').mockImplementation(() => findQuery);
 
     const res = await service.findAll();
 
@@ -38,7 +38,12 @@ describe('TagsService', () => {
   })
 
   it('should handle error trying to retrieve all tags', async () => {
-    test.todo
+
+    jest.spyOn(articleModel, 'find').mockImplementation(() => { throw new Error() });
+
+    const res = await service.findAll();
+
+    expect(res).toEqual([]);
   });
 
 });
