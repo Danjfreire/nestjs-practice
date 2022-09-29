@@ -39,7 +39,7 @@ export class ArticlesService {
       favoritesCount: 0,
     };
 
-    const article = await new this.articleModel(articleData).save();
+    const article = await this.articleModel.create(articleData);
 
     return (await article.populate('author')).toJSON(user);
   }
@@ -74,7 +74,7 @@ export class ArticlesService {
           .skip(queryOptions.offset)
           .limit(queryOptions.limit)
           .populate('author'),
-      ]);
+      ]); 
 
       const res = {
         articlesCount,

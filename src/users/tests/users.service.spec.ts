@@ -6,7 +6,7 @@ import { AuthService } from '../../auth/auth.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserAuth } from '../interfaces/user.interface';
-import { User, UserDocument } from '../schemas/user.schema';
+import { User } from '../schemas/user.schema';
 import { UsersService } from '../users.service';
 
 const MOCK_USER_DOC = {
