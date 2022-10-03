@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { fail } from 'assert';
 import { UsersService } from '../../users/users.service';
 import { ArticlesService } from '../articles.service';
 import { CreateArticleDto } from '../dto/create-article.dto';
@@ -200,18 +201,294 @@ describe('ArticlesService', () => {
   });
 
   it('should update article', async () => {
-    test.todo
+    const mockArticle = {
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 9,
+      author: { toString: () => 'id' },
+      populate: jest.fn(async () => ({ toJSON: () => JSON.parse(JSON.stringify(MOCK_ARTICLE_JSON)) })),
+      save: jest.fn(async () => mockArticle),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    const res = await service.updateArticle('slug', { title: 'updated title' }, 'id');
+
+    expect(mockArticle.save).toHaveBeenCalledTimes(1);
+    expect(mockArticle.populate).toHaveBeenCalledWith('author');
+    expect(res).toEqual(JSON.parse(JSON.stringify(MOCK_ARTICLE_JSON)));
+  });
+
+  it('should throw error if different user tries to update article', async () => {
+
+    const mockUser = {
+      _id: 'differentId',
+    }
+
+    const mockArticle = {
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 9,
+      author: { toString: () => 'id' },
+      populate: jest.fn(async () => ({ toJSON: () => JSON.parse(JSON.stringify(MOCK_ARTICLE_JSON)) })),
+      save: jest.fn(async () => mockArticle),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(mockUser)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    try {
+      const res = await service.updateArticle('slug', { title: 'updated title' }, 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('User does not have access to article');
+    }
   });
 
   it('should delete article', async () => {
-    test.todo
+    const mockArticle = {
+      author: { toString: () => 'id' },
+      delete: jest.fn(async () => { }),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    await service.deleteArticle('slug', 'id');
+
+    expect(mockArticle.delete).toHaveBeenCalled();
   });
+
+  it('should handle error trying to delete article', async () => {
+    const mockUser = {
+      _id: 'differentId',
+    }
+
+    const mockArticle = {
+      author: { toString: () => 'id' },
+      delete: jest.fn(async () => { }),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => mockUser as any);
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    try {
+      await service.deleteArticle('slug', 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('User does not have access to article')
+    }
+
+  })
 
   it('should favorite article', async () => {
-    test.todo
+    const mockArticle = {
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 9,
+      author: { toString: () => 'id' },
+      populate: jest.fn(async () => ({
+        toJSON: () => ({
+          title: mockArticle.title,
+          body: mockArticle.body,
+          createdAt: mockArticle.createdAt,
+          updatedAt: mockArticle.updatedAt,
+          description: mockArticle.description,
+          favorited: mockArticle.favorited,
+          slug: mockArticle.slug,
+          tagList: mockArticle.tagList,
+          favoritesCount: mockArticle.favoritesCount,
+          author: {
+            bio: 'bio',
+            following: true,
+            image: 'imageUrl',
+            username: 'username'
+          }
+        })
+      })),
+      save: jest.fn(async () => mockArticle),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+    jest.spyOn(usersService, 'addFavoriteArticle').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+
+    const res = await service.favoriteArticle('slug', 'id');
+
+    expect(mockArticle.save).toHaveBeenCalled();
+    expect(mockArticle.populate).toHaveBeenCalledWith('author');
+    expect(res).toEqual({
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 10,
+      author: {
+        bio: 'bio',
+        following: true,
+        image: 'imageUrl',
+        username: 'username'
+      }
+    });
   });
 
-  it('should unfavorite article', async () => {
-    test.todo
+  it('should throw error if article is not found trying to favorite', async () => {
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => null);
+
+    try {
+      await service.favoriteArticle('slug', 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('Article not found');
+    }
   });
+
+  it('should throw error if article is already favorited', async () => {
+    const mockArticle = {
+      _id : 'articleId'
+    };
+
+    const mockUser = {
+      _id : 'id',
+      favorites : [
+        'articleId'
+      ]
+    };
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => mockUser as any);
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    try {
+      await service.favoriteArticle('slug', 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('Article already favorited')
+    }
+  })
+
+  it('should unfavorite article', async () => {
+
+    const mockUser = {
+      _id : 'id',
+      favorites : ['articleId']
+    };
+
+    const mockArticle = {
+      _id : 'articleId',
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 9,
+      author: { toString: () => 'id' },
+      populate: jest.fn(async () => ({
+        toJSON: () => ({
+          title: mockArticle.title,
+          body: mockArticle.body,
+          createdAt: mockArticle.createdAt,
+          updatedAt: mockArticle.updatedAt,
+          description: mockArticle.description,
+          favorited: mockArticle.favorited,
+          slug: mockArticle.slug,
+          tagList: mockArticle.tagList,
+          favoritesCount: mockArticle.favoritesCount,
+          author: {
+            bio: 'bio',
+            following: true,
+            image: 'imageUrl',
+            username: 'username'
+          }
+        })
+      })),
+      save: jest.fn(async () => mockArticle),
+    }
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => mockUser as any);
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+    jest.spyOn(usersService, 'removeFavoriteArticle').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+
+    const res = await service.unfavoriteArticle('slug', 'id');
+
+    expect(mockArticle.save).toHaveBeenCalled();
+    expect(mockArticle.populate).toHaveBeenCalledWith('author');
+    expect(res).toEqual({
+      title: 'title',
+      body: 'body',
+      createdAt: '2022-09-27T16:04:54.084Z',
+      updatedAt: '2022-09-27T16:04:54.084Z',
+      description: 'description',
+      favorited: false,
+      slug: 'slug',
+      tagList: ['tag1', 'tag2'],
+      favoritesCount: 8,
+      author: {
+        bio: 'bio',
+        following: true,
+        image: 'imageUrl',
+        username: 'username'
+      }
+    });
+  });
+
+  it('should throw error if article is not found trying to unfavorite', async () => {
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => JSON.parse(JSON.stringify(MOCK_USER_DOC)));
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => null);
+
+    try {
+      await service.unfavoriteArticle('slug', 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('Article not found');
+    }
+  });
+
+  it('should throw error if article is not favorited', async () => {
+    const mockArticle = {
+      _id : 'articleId'
+    };
+
+    const mockUser = {
+      _id : 'id',
+      favorites : []
+    };
+
+    jest.spyOn(usersService, 'findById').mockImplementation(async () => mockUser as any);
+    jest.spyOn(articleModel, 'findOne').mockImplementation(async () => mockArticle);
+
+    try {
+      await service.unfavoriteArticle('slug', 'id');
+      fail();
+    } catch (error) {
+      expect(error.message).toEqual('Article is not favorited by user')
+    }
+  })
+  
 });

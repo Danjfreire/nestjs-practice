@@ -164,6 +164,7 @@ export class ArticlesService {
       }
     }
 
+
     const updatedArticle = await (await article.save()).populate('author');
 
     return updatedArticle.toJSON(user);
@@ -189,7 +190,7 @@ export class ArticlesService {
   ): Promise<ArticleJSON> {
     const [user, article] = await Promise.all([
       this.userService.findById(requesterId),
-      this.articleModel.findOne({ slug }).populate('author'),
+      this.articleModel.findOne({ slug }),
     ]);
 
     if (!article) {
@@ -219,7 +220,7 @@ export class ArticlesService {
   ): Promise<ArticleJSON> {
     const [user, article] = await Promise.all([
       this.userService.findById(requesterId),
-      this.articleModel.findOne({ slug }).populate('author'),
+      this.articleModel.findOne({ slug }),
     ]);
 
     if (!article) {
